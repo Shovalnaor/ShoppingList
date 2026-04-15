@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Smart Grocery Premium - Firebase Edition</title>
+    <title>Smart Grocery Premium</title>
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
         import { getFirestore, collection, onSnapshot, setDoc, doc, deleteDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Your web app's Firebase configuration
+        // Your exact Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCTIK6rlnAEUP2VfvWTjkDX0gIiMGXoyCk",
             authDomain: "shoppinglist-52927.firebaseapp.com",
@@ -20,14 +21,17 @@
             measurementId: "G-2NTB28VG69"
         };
         
-        let db;
         try {
             const app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            window.firebaseDb = db; // Expose globally for the App logic
+            const analytics = getAnalytics(app);
+            const db = getFirestore(app);
+            
+            // Expose globally so the App can use it without being inside the module
+            window.firebaseDb = db; 
             window.firebaseDocs = { collection, onSnapshot, setDoc, doc, deleteDoc, writeBatch };
+            console.log("Firebase successfully initialized");
         } catch (e) {
-            console.error("Firebase init failed. Running in Local Storage fallback mode.", e);
+            console.error("Firebase init failed:", e);
         }
     </script>
     
@@ -57,48 +61,60 @@
         .progress-text { font-size: 13px; font-weight: 600; color: var(--text-muted); }
         .progress-bar-bg { width: 100px; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
         .progress-bar-fill { height: 100%; background: var(--success); transition: width 0.5s ease; width: 0%; }
+        
         .container { max-width: 700px; margin: 0 auto; padding: 0 20px; }
         .list-area { display: flex; flex-direction: column; gap: 24px; margin-top: 20px; }
         .category-group { animation: slideUpFade 0.4s ease; }
         .category-header { font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
         .items-card { background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); overflow: hidden; }
+        
         .item-row { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid var(--border); background: var(--surface); transition: var(--transition); position: relative; }
         .item-row:last-child { border-bottom: none; }
         .item-row:active { background: #F8F8FA; }
+        
         .checkbox-wrapper { width: 28px; height: 28px; margin-left: 14px; flex-shrink: 0; cursor: pointer; position: relative; }
         .checkbox-input { opacity: 0; position: absolute; width: 100%; height: 100%; cursor: pointer; z-index: 2; }
         .checkbox-custom { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 2px solid var(--text-muted); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
         .checkbox-custom svg { width: 14px; height: 14px; color: white; stroke-dasharray: 20; stroke-dashoffset: 20; transition: stroke-dashoffset 0.3s ease; }
         .checkbox-input:checked + .checkbox-custom { background: var(--success); border-color: var(--success); }
         .checkbox-input:checked + .checkbox-custom svg { stroke-dashoffset: 0; }
+        
         .item-content { flex: 1; display: flex; flex-direction: column; cursor: pointer; }
         .item-name { font-size: 17px; font-weight: 600; transition: var(--transition); }
         .item-category-label { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
         .item-row.completed .item-name { text-decoration: line-through; color: var(--text-muted); }
         .item-row.completed { opacity: 0.6; background: #FAFAFC; }
+        
         .item-actions { display: flex; align-items: center; gap: 12px; }
         .qty-control { display: flex; align-items: center; background: var(--background); border-radius: 20px; padding: 4px 6px; }
         .qty-btn { background: none; border: none; font-size: 16px; font-weight: bold; color: var(--primary); cursor: pointer; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
         .qty-input { width: 32px; font-size: 15px; font-weight: 700; text-align: center; border: none; background: transparent; color: var(--text-main); outline: none; -moz-appearance: textfield; font-family: inherit; }
         .qty-input::-webkit-outer-spin-button, .qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        
         .action-btn { background: none; border: none; color: var(--text-muted); padding: 8px; border-radius: 50%; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; }
         .action-btn:hover { background: var(--background); color: var(--text-main); }
         .action-btn.edit:hover { color: var(--secondary); background: rgba(255, 159, 10, 0.1); }
+        
         .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface-glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 12px 20px calc(12px + env(safe-area-inset-bottom)); box-shadow: 0 -10px 30px rgba(0,0,0,0.05); border-top: 1px solid var(--border); z-index: 100; }
         .bottom-bar-inner { max-width: 700px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+        
         .suggestions { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
         .suggestions::-webkit-scrollbar { display: none; }
         .chip { background: var(--surface); border: 1px solid var(--primary); color: var(--primary); padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 4px; }
         .chip:hover, .chip:active { background: var(--primary); color: white; transform: translateY(-2px); }
+        
         .input-row { display: flex; gap: 10px; align-items: center; }
         .input-wrapper { flex: 1; position: relative; }
         .main-input { width: 100%; background: var(--surface); border: 2px solid transparent; border-radius: var(--radius-lg); padding: 16px 20px; font-size: 17px; box-shadow: var(--shadow-sm); outline: none; transition: var(--transition); }
         .main-input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(94, 92, 230, 0.1); }
+        
         .main-qty-wrapper { display: flex; align-items: center; background: var(--surface); border-radius: var(--radius-lg); padding: 0 5px; box-shadow: var(--shadow-sm); height: 54px; }
         .main-qty-wrapper .qty-btn { width: 36px; height: 36px; font-size: 20px; }
         .main-qty-wrapper .qty-input { font-size: 18px; width: 36px; }
+        
         .add-btn { background: var(--primary); color: white; border: none; width: 54px; height: 54px; border-radius: var(--radius-lg); font-size: 24px; cursor: pointer; box-shadow: var(--shadow-lg); transition: var(--transition); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .add-btn:active { transform: scale(0.9); box-shadow: none; }
+        
         .fab-shop { position: fixed; bottom: 140px; left: 20px; z-index: 90; background: var(--surface); color: var(--text-main); padding: 12px 20px; border-radius: 30px; font-weight: 700; font-size: 15px; box-shadow: var(--shadow-md); border: 1px solid var(--border); display: flex; align-items: center; gap: 8px; cursor: pointer; transition: var(--transition); }
         body.shopping-mode .fab-shop { background: var(--primary); color: white; border-color: var(--primary); }
         body.shopping-mode { --surface: #000; --text-main: #fff; --background: #111; --surface-glass: rgba(0,0,0,0.85); --border: #333; }
@@ -106,6 +122,7 @@
         body.shopping-mode .item-name { font-size: 22px; }
         body.shopping-mode .checkbox-wrapper { width: 34px; height: 34px; }
         body.shopping-mode .bottom-bar { display: none; }
+        
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 1000; display: flex; align-items: flex-end; justify-content: center; opacity: 0; visibility: hidden; transition: var(--transition); }
         .modal-overlay.active { opacity: 1; visibility: visible; }
         .modal-sheet { background: var(--surface); width: 100%; max-width: 600px; border-top-left-radius: var(--radius-xl); border-top-right-radius: var(--radius-xl); padding: 24px 20px calc(24px + env(safe-area-inset-bottom)); transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); max-height: 90vh; display: flex; flex-direction: column; }
