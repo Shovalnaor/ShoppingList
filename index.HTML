@@ -4,20 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Smart Grocery Premium - Firebase Edition</title>
+    
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, onSnapshot, setDoc, doc, deleteDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // =========================================================
-        // TODO: REPLACE WITH YOUR FIREBASE CONFIG
-        // =========================================================
+        // Your web app's Firebase configuration
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "your-project-id.firebaseapp.com",
-            projectId: "your-project-id",
-            storageBucket: "your-project-id.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyCTIK6rlnAEUP2VfvWTjkDX0gIiMGXoyCk",
+            authDomain: "shoppinglist-52927.firebaseapp.com",
+            projectId: "shoppinglist-52927",
+            storageBucket: "shoppinglist-52927.firebasestorage.app",
+            messagingSenderId: "30989466687",
+            appId: "1:30989466687:web:a05b9fee0c4bad4d374c8a",
+            measurementId: "G-2NTB28VG69"
         };
         
         let db;
@@ -27,7 +27,7 @@
             window.firebaseDb = db; // Expose globally for the App logic
             window.firebaseDocs = { collection, onSnapshot, setDoc, doc, deleteDoc, writeBatch };
         } catch (e) {
-            console.error("Firebase init failed (Did you replace the config?). Running in Local Storage fallback mode.", e);
+            console.error("Firebase init failed. Running in Local Storage fallback mode.", e);
         }
     </script>
     
@@ -47,7 +47,6 @@
         body { font-family: var(--font-main); color: var(--text-main); background: linear-gradient(-45deg, #f2f2f7, #e0e5ff, #fdfbfb, #f3e7e9); background-size: 400% 400%; animation: gradientBG 15s ease infinite; padding-bottom: 160px; min-height: 100vh; overflow-y: scroll; -webkit-font-smoothing: antialiased; }
         @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        /* UI Elements (Minified for brevity, identical to previous version) */
         header { position: sticky; top: 0; z-index: 50; padding: calc(20px + env(safe-area-inset-top)) 20px 15px; background: var(--surface-glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid transparent; transition: var(--transition); }
         header.scrolled { border-bottom-color: var(--border); box-shadow: var(--shadow-sm); }
         .header-content { display: flex; justify-content: space-between; align-items: flex-end; max-width: 700px; margin: 0 auto; }
@@ -234,18 +233,16 @@
 
         const App = {
             state: {
-                items: [], // Will be populated from Firebase or LocalStorage
+                items: [],
                 categories: JSON.parse(localStorage.getItem('premium_grocery_cats_v1')) || DEFAULT_CATEGORIES,
-                learnedDict: JSON.parse(localStorage.getItem('premium_learned_dict_v1')) || {}, // User's custom assignments
+                learnedDict: JSON.parse(localStorage.getItem('premium_learned_dict_v1')) || {},
                 mainQty: 1,
                 editQty: 1,
                 shoppingMode: false,
                 isOnline: false
             },
 
-            // Expanded Smart Dictionary
             SMART_DICT: {
-                // PRODUCE
                 'עגבני': 'PRODUCE', 'מלפפון': 'PRODUCE', 'בננ': 'PRODUCE', 'תפוח': 'PRODUCE', 'בצל': 'PRODUCE', 'תפו"א': 'PRODUCE', 'תפוח אדמה': 'PRODUCE',
                 'פלפל': 'PRODUCE', 'שום': 'PRODUCE', 'גזר': 'PRODUCE', 'בטטה': 'PRODUCE', 'קישוא': 'PRODUCE', 'חציל': 'PRODUCE', 'כרוב': 'PRODUCE',
                 'חסה': 'PRODUCE', 'פטריות': 'PRODUCE', 'לימון': 'PRODUCE', 'אבוקדו': 'PRODUCE', 'תפוז': 'PRODUCE', 'קלמנטינ': 'PRODUCE',
@@ -254,25 +251,21 @@
                 'כרובית': 'PRODUCE', 'ברוקולי': 'PRODUCE', 'סלק': 'PRODUCE', 'צנון': 'PRODUCE', 'קולורבי': 'PRODUCE', 'מנגולד': 'PRODUCE',
                 'תרד': 'PRODUCE', 'בזיל': 'PRODUCE', 'רימון': 'PRODUCE', 'קיווי': 'PRODUCE', 'דובדבנים': 'PRODUCE', 'ירק': 'PRODUCE', 'פרי': 'PRODUCE',
 
-                // PROTEIN
                 'חזה עוף': 'PROTEIN', 'שניצל עוף': 'PROTEIN', 'עוף': 'PROTEIN', 'בקר': 'PROTEIN', 'סלמון': 'PROTEIN', 'טונה': 'PROTEIN',
                 'שניצל': 'PROTEIN', 'בשר': 'PROTEIN', 'שוקיים': 'PROTEIN', 'כרעיים': 'PROTEIN', 'כנפיים': 'PROTEIN', 'פרגית': 'PROTEIN',
                 'טחון': 'PROTEIN', 'אנטריקוט': 'PROTEIN', 'קבב': 'PROTEIN', 'המבורגר': 'PROTEIN', 'נקניקיות': 'PROTEIN', 'דג': 'PROTEIN',
                 'אמנון': 'PROTEIN', 'דניס': 'PROTEIN', 'פסטרמה': 'PROTEIN', 'סלמי': 'PROTEIN', 'פילה': 'PROTEIN', 'נקניק': 'PROTEIN',
                 'רוסטביף': 'PROTEIN', 'אסאדו': 'PROTEIN', 'צלעות': 'PROTEIN', 'נסיכת הנילוס': 'PROTEIN', 'לברק': 'PROTEIN',
 
-                // DAIRY
                 'חלב סויה': 'DAIRY', 'חלב שקדים': 'DAIRY', 'חלב שיבולת': 'DAIRY', 'חלב': 'DAIRY', 'ביצ': 'DAIRY', 'יוגורט': 'DAIRY', 'קוטג': 'DAIRY',
                 'חלבון': 'DAIRY', 'גבינ': 'DAIRY', 'חמאה': 'DAIRY', 'צהובה': 'DAIRY', 'לבנה': 'DAIRY', 'מעדן': 'DAIRY', 'מילקי': 'DAIRY',
                 'שמנת': 'DAIRY', 'ריקוטה': 'DAIRY', 'בולגרית': 'DAIRY', 'פטה': 'DAIRY', 'חלומי': 'DAIRY', 'שוקו': 'DAIRY', 'טופו': 'DAIRY',
                 'מוצרלה': 'DAIRY', 'פרמזן': 'DAIRY', 'גאודה': 'DAIRY', 'לאבנה': 'DAIRY', 'צפתית': 'DAIRY', 'גיל': 'DAIRY', 'אשל': 'DAIRY',
 
-                // BAKERY
                 'פירורי לחם': 'BAKERY', 'לחם': 'BAKERY', 'פית': 'BAKERY', 'חלה': 'BAKERY', 'לחמני': 'BAKERY', 'באגט': 'BAKERY',
                 'פוקאצ': 'BAKERY', 'בורקס': 'BAKERY', 'קרואסון': 'BAKERY', 'עוגת': 'BAKERY', 'רוגלך': 'BAKERY', 'קרקר': 'BAKERY',
                 'פריכיות': 'BAKERY', 'טורטיה': 'BAKERY', 'טוסט': 'BAKERY', 'מאפ': 'BAKERY', 'פנקייק': 'BAKERY', 'וופל בלגי': 'BAKERY',
 
-                // PANTRY
                 'חמאת בוטנים': 'PANTRY', 'שוקולד למריחה': 'PANTRY', 'נוטלה': 'PANTRY', 'אורז': 'PANTRY', 'פסטה': 'PANTRY', 'שמן': 'PANTRY', 'קפה': 'PANTRY',
                 'קטשופ': 'PANTRY', 'מיונז': 'PANTRY', 'ספגטי': 'PANTRY', 'פתיתים': 'PANTRY', 'מקרוני': 'PANTRY', 'נודלס': 'PANTRY',
                 'קינואה': 'PANTRY', 'בורגול': 'PANTRY', 'כוסמת': 'PANTRY', 'עדשים': 'PANTRY', 'שעועית': 'PANTRY', 'חומוס': 'PANTRY',
@@ -282,24 +275,20 @@
                 'תירס': 'PANTRY', 'אפונה': 'PANTRY', 'ריבה': 'PANTRY', 'דבש': 'PANTRY', 'סילאן': 'PANTRY', 'תה': 'PANTRY', 'קוואקר': 'PANTRY',
                 'גרנולה': 'PANTRY', 'קורנפלקס': 'PANTRY', 'דגני בוקר': 'PANTRY', 'נס קפה': 'PANTRY', 'קפסולות': 'PANTRY',
 
-                // FROZEN
                 'שניצל תירס': 'FROZEN', 'ירקות סנפרוסט': 'FROZEN', 'בצק עלים': 'FROZEN', 'קפוא': 'FROZEN', 'גליד': 'FROZEN', 'פיצה': 'FROZEN',
                 'ארטיק': 'FROZEN', 'שלגון': 'FROZEN', 'אדממה': 'FROZEN', 'לקט': 'FROZEN', 'צ\'יפס (קפוא)': 'FROZEN', 'מלאווח': 'FROZEN', 'ג\'חנון': 'FROZEN',
 
-                // SNACKS
                 'במבה': 'SNACKS', 'שוקולד': 'SNACKS', 'חטיף': 'SNACKS', 'עוגיות': 'SNACKS', 'ביסלי': 'SNACKS', 'צ\'יפס': 'SNACKS',
                 'תפוצ\'יפס': 'SNACKS', 'דוריטוס': 'SNACKS', 'אפרופו': 'SNACKS', 'כיפלי': 'SNACKS', 'מקופלת': 'SNACKS', 'פסק זמן': 'SNACKS',
                 'טעמי': 'SNACKS', 'כיף כף': 'SNACKS', 'סניקרס': 'SNACKS', 'וופלים': 'SNACKS', 'ביסקוויטים': 'SNACKS', 'סוכריות': 'SNACKS',
                 'מסטיק': 'SNACKS', 'בייגלה': 'SNACKS', 'גרעינים': 'SNACKS', 'שקדים': 'SNACKS', 'אגוזים': 'SNACKS', 'בוטנים': 'SNACKS',
                 'פיצוחים': 'SNACKS', 'פופקורן': 'SNACKS', 'מתוקים': 'SNACKS', 'מלוחים': 'SNACKS', 'קליק': 'SNACKS', 'קינדר': 'SNACKS',
 
-                // DRINKS
                 'משקה אנרגיה': 'DRINKS', 'מים': 'DRINKS', 'קולה': 'DRINKS', 'מיץ': 'DRINKS', 'בירה': 'DRINKS', 'ספרייט': 'DRINKS',
                 'פנטה': 'DRINKS', 'תפוזים': 'DRINKS', 'תפוחים': 'DRINKS', 'אשכוליות': 'DRINKS', 'פטל': 'DRINKS', 'ויטמינצ\'יק': 'DRINKS',
                 'סודה': 'DRINKS', 'יין': 'DRINKS', 'וודקה': 'DRINKS', 'וויסקי': 'DRINKS', 'אקסל': 'DRINKS', 'משקה': 'DRINKS', 'שתייה': 'DRINKS',
                 'נביעות': 'DRINKS', 'מי עדן': 'DRINKS', 'טרופית': 'DRINKS',
 
-                // HOUSEHOLD
                 'נייר טואלט': 'HOUSEHOLD', 'נייר סופג': 'HOUSEHOLD', 'אבקת כביסה': 'HOUSEHOLD', 'מרכך כביסה': 'HOUSEHOLD', 'מסיר שומנים': 'HOUSEHOLD',
                 'מטהר אוויר': 'HOUSEHOLD', 'ניילון נצמד': 'HOUSEHOLD', 'נייר אפייה': 'HOUSEHOLD', 'משחת שיניים': 'HOUSEHOLD', 'מברשת שיניים': 'HOUSEHOLD',
                 'קצף גילוח': 'HOUSEHOLD', 'סכיני גילוח': 'HOUSEHOLD', 'כלב': 'HOUSEHOLD', 'חתול': 'HOUSEHOLD', 'שמפו': 'HOUSEHOLD', 'נייר': 'HOUSEHOLD',
@@ -310,8 +299,6 @@
             },
 
             SUGGESTIONS: ['חלב', 'ביצים', 'לחם', 'עגבניות', 'מלפפונים', 'חזה עוף', 'אורז', 'קפה', 'נייר טואלט', 'מארז מים'],
-
-            // Collection name in Firebase
             DB_COLLECTION: 'grocery_list',
 
             init() {
@@ -323,7 +310,6 @@
             },
 
             initData() {
-                // If Firebase is available, sync. Otherwise, fallback to LocalStorage.
                 setTimeout(() => {
                     if (window.firebaseDb && window.firebaseDocs) {
                         this.state.isOnline = true;
@@ -334,21 +320,19 @@
                         this.state.items = JSON.parse(localStorage.getItem('premium_grocery_items_v1')) || [];
                         this.render();
                     }
-                }, 1000); // Small delay to ensure module load
+                }, 1000);
             },
 
             setupFirebaseSync() {
                 const { collection, onSnapshot } = window.firebaseDocs;
                 const itemsRef = collection(window.firebaseDb, this.DB_COLLECTION);
                 
-                // Real-time listener
                 onSnapshot(itemsRef, (snapshot) => {
                     const items = [];
                     snapshot.forEach((doc) => {
                         items.push({ id: doc.id, ...doc.data() });
                     });
                     this.state.items = items;
-                    // Also save locally as backup
                     localStorage.setItem('premium_grocery_items_v1', JSON.stringify(items));
                     this.render();
                 }, (error) => {
@@ -359,7 +343,6 @@
             },
 
             async saveItem(item) {
-                // Update local state immediately for UI responsiveness
                 const index = this.state.items.findIndex(i => i.id === item.id);
                 if (index > -1) this.state.items[index] = item;
                 else this.state.items.push(item);
@@ -408,20 +391,13 @@
 
             cacheDOM() {
                 this.dom = {
-                    input: document.getElementById('main-input'),
-                    list: document.getElementById('list-container'),
-                    mainQty: document.getElementById('main-qty'),
-                    suggestions: document.getElementById('suggestions-box'),
-                    progText: document.getElementById('progress-text'),
-                    progBar: document.getElementById('progress-bar'),
-                    header: document.getElementById('header'),
-                    editModal: document.getElementById('edit-modal'),
-                    editId: document.getElementById('edit-id'),
-                    editName: document.getElementById('edit-name'),
-                    editQty: document.getElementById('edit-qty'),
-                    editCat: document.getElementById('edit-category'),
-                    settingsModal: document.getElementById('settings-modal'),
-                    categoryEditList: document.getElementById('category-edit-list')
+                    input: document.getElementById('main-input'), list: document.getElementById('list-container'),
+                    mainQty: document.getElementById('main-qty'), suggestions: document.getElementById('suggestions-box'),
+                    progText: document.getElementById('progress-text'), progBar: document.getElementById('progress-bar'),
+                    header: document.getElementById('header'), editModal: document.getElementById('edit-modal'),
+                    editId: document.getElementById('edit-id'), editName: document.getElementById('edit-name'),
+                    editQty: document.getElementById('edit-qty'), editCat: document.getElementById('edit-category'),
+                    settingsModal: document.getElementById('settings-modal'), categoryEditList: document.getElementById('category-edit-list')
                 };
             },
 
@@ -432,21 +408,13 @@
                     else this.dom.header.classList.remove('scrolled');
                 });
                 [this.dom.editModal, this.dom.settingsModal].forEach(modal => {
-                    modal.addEventListener('click', (e) => {
-                        if (e.target === modal) modal.classList.remove('active');
-                    });
+                    modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
                 });
             },
 
             detectCategory(name) {
                 const lowerName = name.toLowerCase();
-                
-                // 1. Check user's learned dictionary first
-                if (this.state.learnedDict[lowerName]) {
-                    return this.state.learnedDict[lowerName];
-                }
-
-                // 2. Fallback to Smart Dict
+                if (this.state.learnedDict[lowerName]) return this.state.learnedDict[lowerName];
                 for (const key of this.sortedDictKeys) {
                     if (name.includes(key)) return this.state.categories[this.SMART_DICT[key]];
                 }
@@ -487,32 +455,20 @@
                     existing.quantity += qty;
                     this.saveItem(existing);
                 } else {
-                    const newItem = {
-                        id: Date.now().toString(36),
-                        name: name,
-                        quantity: qty,
-                        category: this.detectCategory(name),
-                        completed: false
-                    };
+                    const newItem = { id: Date.now().toString(36), name: name, quantity: qty, category: this.detectCategory(name), completed: false };
                     this.saveItem(newItem);
                 }
             },
 
             toggleItem(id) {
                 const item = this.state.items.find(i => i.id === id);
-                if (item) {
-                    item.completed = !item.completed;
-                    this.saveItem(item);
-                }
+                if (item) { item.completed = !item.completed; this.saveItem(item); }
             },
 
             changeItemQty(id, delta, event) {
                 event.stopPropagation();
                 const item = this.state.items.find(i => i.id === id);
-                if (item) {
-                    item.quantity = Math.max(1, item.quantity + delta);
-                    this.saveItem(item);
-                }
+                if (item) { item.quantity = Math.max(1, item.quantity + delta); this.saveItem(item); }
             },
 
             setItemQty(id, val, event) {
@@ -520,10 +476,7 @@
                 let num = parseInt(val);
                 if (isNaN(num) || num < 1) num = 1;
                 const item = this.state.items.find(i => i.id === id);
-                if (item) {
-                    item.quantity = num;
-                    this.saveItem(item);
-                }
+                if (item) { item.quantity = num; this.saveItem(item); }
             },
 
             openEdit(id, event) {
@@ -536,7 +489,6 @@
                 this.state.editQty = item.quantity;
                 this.dom.editQty.value = item.quantity;
                 this.dom.editCat.value = item.category;
-
                 this.dom.editModal.classList.add('active');
             },
 
@@ -564,13 +516,8 @@
                 if (item) {
                     item.name = name;
                     item.quantity = this.state.editQty;
-                    
-                    // If category changed, learn it
-                    if (item.category !== newCat) {
-                        this.learnCategory(name, newCat);
-                    }
+                    if (item.category !== newCat) this.learnCategory(name, newCat);
                     item.category = newCat;
-                    
                     this.saveItem(item);
                 }
                 this.closeEdit();
@@ -617,7 +564,6 @@
                     localStorage.setItem('premium_grocery_cats_v1', JSON.stringify(this.state.categories));
                     this.populateCategories();
 
-                    // Update items in state and DB
                     const promises = [];
                     this.state.items.forEach(item => {
                         if (oldToNewMap[item.category]) {
@@ -626,7 +572,6 @@
                         }
                     });
                     
-                    // Also update learned dictionary
                     let dictUpdated = false;
                     for (const term in this.state.learnedDict) {
                         if (oldToNewMap[this.state.learnedDict[term]]) {
