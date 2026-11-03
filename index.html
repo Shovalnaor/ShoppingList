@@ -4,9 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#F2F2F7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>Smart Grocery Premium - Pro Edition</title>
 
-```
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
@@ -22,14 +24,14 @@
         appId: "1:30989466687:web:a05b9fee0c4bad4d374c8a",
         measurementId: "G-2NTB28VG69"
     };
-    
+
     try {
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
         const db = getFirestore(app);
-        
+
         // Expose globally so the App can use it without being inside the module
-        window.firebaseDb = db; 
+        window.firebaseDb = db;
         window.firebaseDocs = { collection, onSnapshot, setDoc, doc, deleteDoc, writeBatch };
         console.log("Firebase successfully initialized");
     } catch (e) {
@@ -43,6 +45,7 @@
         --success: #32D74B; --danger: #FF453A; --background: #F2F2F7;
         --surface: #FFFFFF; --surface-glass: rgba(255, 255, 255, 0.85);
         --text-main: #1C1C1E; --text-muted: #8E8E93; --border: rgba(60, 60, 67, 0.1);
+        --fill: rgba(118, 118, 128, 0.12);
         --font-main: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         --radius-xl: 24px; --radius-lg: 16px; --radius-md: 12px;
         --shadow-sm: 0 2px 8px rgba(0,0,0,0.04); --shadow-md: 0 8px 24px rgba(0,0,0,0.08); --shadow-lg: 0 16px 40px rgba(94, 92, 230, 0.15);
@@ -50,96 +53,225 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    body { font-family: var(--font-main); color: var(--text-main); background: linear-gradient(-45deg, #f2f2f7, #e0e5ff, #fdfbfb, #f3e7e9); background-size: 400% 400%; animation: gradientBG 15s ease infinite; padding-bottom: 160px; min-height: 100vh; overflow-y: scroll; -webkit-font-smoothing: antialiased; }
+    body { font-family: var(--font-main); color: var(--text-main); background: linear-gradient(-45deg, #f2f2f7, #e0e5ff, #fdfbfb, #f3e7e9); background-size: 400% 400%; animation: gradientBG 15s ease infinite; padding-bottom: 210px; min-height: 100vh; overflow-y: scroll; -webkit-font-smoothing: antialiased; }
     @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+    button { font-family: inherit; }
 
-    header { position: sticky; top: 0; z-index: 50; padding: calc(20px + env(safe-area-inset-top)) 20px 15px; background: var(--surface-glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid transparent; transition: var(--transition); }
+    header { position: sticky; top: 0; z-index: 50; padding: calc(20px + env(safe-area-inset-top)) 20px 12px; background: var(--surface-glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid transparent; transition: var(--transition); }
     header.scrolled { border-bottom-color: var(--border); box-shadow: var(--shadow-sm); }
     .header-content { display: flex; justify-content: space-between; align-items: flex-end; max-width: 700px; margin: 0 auto; }
     .title-area h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(135deg, var(--primary), #BF5AF2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;}
-    .sync-status { font-size: 12px; background: var(--border); padding: 4px 8px; border-radius: 12px; color: var(--text-muted); font-weight: 600; }
+    .sync-status { font-size: 12px; background: var(--border); padding: 4px 8px; border-radius: 12px; color: var(--text-muted); font-weight: 600; -webkit-text-fill-color: currentColor; }
     .sync-status.online { background: rgba(50, 215, 75, 0.1); color: var(--success); }
     .progress-container { display: flex; align-items: center; gap: 10px; }
     .progress-text { font-size: 13px; font-weight: 600; color: var(--text-muted); }
     .progress-bar-bg { width: 100px; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
     .progress-bar-fill { height: 100%; background: var(--success); transition: width 0.5s ease; width: 0%; }
-    
+
+    /* --- לשוניות --- */
+    .tabs { position: relative; display: flex; max-width: 700px; margin: 14px auto 0; padding: 3px; background: var(--fill); border-radius: 14px; }
+    .tab-indicator { position: absolute; top: 3px; bottom: 3px; right: 3px; width: calc(50% - 3px); background: var(--surface); border-radius: 11px; box-shadow: 0 3px 8px rgba(0,0,0,0.12), 0 1px 1px rgba(0,0,0,0.04); transition: transform 0.4s cubic-bezier(0.3, 1.2, 0.4, 1); }
+    body.tab-home .tab-indicator { transform: translateX(-100%); }
+    .tab-btn { position: relative; z-index: 1; flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 6px; border: none; background: none; border-radius: 11px; font-size: 15px; font-weight: 700; color: var(--text-muted); cursor: pointer; white-space: nowrap; transition: color 0.25s ease; }
+    .tab-btn.active { color: var(--text-main); }
+    .tab-emoji { font-size: 17px; line-height: 1; }
+    .tab-badge { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--fill); color: var(--text-muted); font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; transition: var(--transition); }
+    .tab-btn.active .tab-badge { background: var(--primary); color: #fff; }
+    .tab-badge:empty { display: none; }
+
     .container { max-width: 700px; margin: 0 auto; padding: 0 20px; }
     .list-area { display: flex; flex-direction: column; gap: 24px; margin-top: 20px; }
-    .category-group { animation: slideUpFade 0.4s ease; }
+    .list-area.animate > * { animation: slideUpFade 0.4s ease both; }
+    .list-area.animate > *:nth-child(2) { animation-delay: 0.04s; }
+    .list-area.animate > *:nth-child(3) { animation-delay: 0.08s; }
+    .list-area.animate > *:nth-child(n+4) { animation-delay: 0.12s; }
     .category-header { font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
     .items-card { background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); overflow: hidden; }
-    
-    .item-row { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid var(--border); background: var(--surface); transition: var(--transition); position: relative; }
+
+    .item-row { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid var(--border); background: var(--surface); transition: var(--transition); position: relative; cursor: pointer; }
     .item-row:last-child { border-bottom: none; }
     .item-row:active { background: #F8F8FA; }
-    
+
     .checkbox-wrapper { width: 28px; height: 28px; margin-left: 14px; flex-shrink: 0; cursor: pointer; position: relative; }
-    .checkbox-input { opacity: 0; position: absolute; width: 100%; height: 100%; cursor: pointer; z-index: 2; }
+    .checkbox-input { opacity: 0; position: absolute; width: 100%; height: 100%; cursor: pointer; z-index: 2; margin: 0; }
     .checkbox-custom { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 2px solid var(--text-muted); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
     .checkbox-custom svg { width: 14px; height: 14px; color: white; stroke-dasharray: 20; stroke-dashoffset: 20; transition: stroke-dashoffset 0.3s ease; }
     .checkbox-input:checked + .checkbox-custom { background: var(--success); border-color: var(--success); }
-    .checkbox-input:checked + .checkbox-custom svg { stroke-dashoffset: 0; }
-    
-    .item-content { flex: 1; display: flex; flex-direction: column; cursor: pointer; }
-    .item-name { font-size: 17px; font-weight: 600; transition: var(--transition); }
+    .checkbox-custom svg { opacity: 0; }
+    .checkbox-input:checked + .checkbox-custom svg { stroke-dashoffset: 0; opacity: 1; }
+    .checkbox-input:disabled + .checkbox-custom { opacity: 0.45; }
+
+    .item-content { flex: 1; min-width: 0; display: flex; flex-direction: column; cursor: pointer; }
+    .item-name { font-size: 17px; font-weight: 600; transition: var(--transition); overflow-wrap: anywhere; }
     .item-category-label { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
     .item-row.completed .item-name { text-decoration: line-through; color: var(--text-muted); }
     .item-row.completed { opacity: 0.6; background: #FAFAFC; }
-    
+
     .item-actions { display: flex; align-items: center; gap: 12px; }
     .qty-control { display: flex; align-items: center; background: var(--background); border-radius: 20px; padding: 4px 6px; }
     .qty-btn { background: none; border: none; font-size: 16px; font-weight: bold; color: var(--primary); cursor: pointer; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
     .qty-input { width: 32px; font-size: 15px; font-weight: 700; text-align: center; border: none; background: transparent; color: var(--text-main); outline: none; -moz-appearance: textfield; font-family: inherit; }
     .qty-input::-webkit-outer-spin-button, .qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-    
-    .action-btn { background: none; border: none; color: var(--text-muted); padding: 8px; border-radius: 50%; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; }
+
+    .action-btn { background: none; border: none; color: var(--text-muted); padding: 8px; border-radius: 50%; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; text-decoration: none; }
     .action-btn:hover { background: var(--background); color: var(--text-main); }
     .action-btn.edit:hover { color: var(--secondary); background: rgba(255, 159, 10, 0.1); }
-    
+
+    /* --- ריהוט וציוד לבית --- */
+    .filter-bar { display: none; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 16px -20px 0; padding: 4px 20px 6px; scroll-padding-inline: 20px; }
+    .filter-bar::-webkit-scrollbar { display: none; }
+    body.tab-home .filter-bar { display: flex; }
+    .fchip { flex-shrink: 0; display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); color: var(--text-main); font-size: 14px; font-weight: 600; box-shadow: var(--shadow-sm); cursor: pointer; transition: var(--transition); white-space: nowrap; }
+    .fchip:active { transform: scale(0.96); }
+    .fchip.active { background: var(--text-main); color: var(--surface); border-color: transparent; box-shadow: 0 6px 16px rgba(0,0,0,0.15); }
+    .fcount { font-size: 12px; font-weight: 700; padding: 1px 7px; border-radius: 10px; background: var(--fill); color: var(--text-muted); }
+    .fchip.active .fcount { background: rgba(255,255,255,0.22); color: inherit; }
+    .fchip.is-empty:not(.active) { color: var(--text-muted); }
+
+    .home-summary { position: relative; overflow: hidden; color: #fff; border-radius: var(--radius-xl); padding: 20px; background: linear-gradient(135deg, #5E5CE6 0%, #7D5BEF 50%, #BF5AF2 100%); box-shadow: 0 18px 40px rgba(94, 92, 230, 0.3); }
+    .home-summary::before, .home-summary::after { content: ''; position: absolute; border-radius: 50%; background: rgba(255,255,255,0.09); pointer-events: none; }
+    .home-summary::before { width: 220px; height: 220px; top: -110px; left: -60px; }
+    .home-summary::after { width: 140px; height: 140px; bottom: -70px; right: -30px; }
+    .sum-head { position: relative; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .sum-head > div { min-width: 0; }
+    .sum-label { font-size: 13px; font-weight: 600; opacity: 0.85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sum-amount { font-size: 34px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.15; margin-top: 2px; }
+    .sum-pack-btn { flex-shrink: 0; border: 1px solid rgba(255,255,255,0.35); background: rgba(255,255,255,0.16); color: #fff; padding: 8px 12px; border-radius: 20px; font-size: 13px; font-weight: 700; cursor: pointer; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); transition: var(--transition); white-space: nowrap; }
+    .sum-pack-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.26); }
+    .sum-stats { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px; }
+    .sum-stat { background: rgba(255,255,255,0.14); border-radius: 14px; padding: 10px 12px; min-width: 0; }
+    .sum-stat span { display: block; font-size: 12px; font-weight: 600; opacity: 0.85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sum-stat b { display: block; font-size: 16px; font-weight: 800; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sum-bar { position: relative; height: 6px; margin-top: 14px; border-radius: 3px; background: rgba(255,255,255,0.25); overflow: hidden; }
+    .sum-bar div { height: 100%; border-radius: 3px; background: #fff; transition: width 0.6s ease; }
+    .sum-hint { position: relative; font-size: 12px; font-weight: 500; opacity: 0.85; margin-top: 10px; }
+
+    .cat-head { width: 100%; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding: 2px; border: none; background: none; color: var(--text-main); font-size: 18px; font-weight: 700; text-align: right; cursor: pointer; }
+    .cat-count { font-size: 12px; font-weight: 700; color: var(--primary); background: rgba(94, 92, 230, 0.12); padding: 2px 8px; border-radius: 10px; }
+    .cat-sum { margin-inline-start: auto; font-size: 14px; font-weight: 700; color: var(--text-muted); white-space: nowrap; }
+    .cat-chev { width: 18px; height: 18px; flex-shrink: 0; color: var(--text-muted); transition: transform 0.3s ease; }
+    .cat-head .cat-count + .cat-chev { margin-inline-start: auto; }
+    .category-group.collapsed .cat-chev { transform: rotate(90deg); }
+    .category-group.collapsed .items-card { display: none; }
+    .category-group.collapsed .cat-head { margin-bottom: 0; }
+
+    .home-row { align-items: center; gap: 0; }
+    .item-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 4px; }
+    .item-meta:empty { display: none; }
+    .item-meta .item-category-label { margin-top: 0; }
+    .pill { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 8px; white-space: nowrap; }
+    .pill.high { color: var(--danger); background: rgba(255, 69, 58, 0.12); }
+    .pill.low { color: var(--text-muted); background: var(--fill); }
+    .qty-badge { display: inline-block; margin-inline-start: 6px; font-size: 13px; font-weight: 700; color: var(--primary); background: rgba(94, 92, 230, 0.1); padding: 1px 7px; border-radius: 8px; vertical-align: 2px; }
+    .item-note { font-size: 13px; color: var(--text-muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .home-row .item-actions { gap: 4px; margin-inline-start: 8px; flex-shrink: 0; }
+    .price-col { display: flex; flex-direction: column; align-items: flex-end; text-align: left; margin-inline-end: 2px; }
+    .price-main { font-size: 15px; font-weight: 800; white-space: nowrap; }
+    .price-unit { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+    .item-row.completed .price-main { text-decoration: line-through; color: var(--text-muted); }
+    .add-price { border: 1px dashed rgba(94, 92, 230, 0.5); background: none; color: var(--primary); padding: 5px 9px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: var(--transition); }
+    .add-price:active { background: rgba(94, 92, 230, 0.1); }
+    .action-btn.link:hover { color: var(--primary); background: rgba(94, 92, 230, 0.1); }
+
+    .empty-cat { background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); padding: 28px 20px; text-align: center; }
+    .empty-cat .ec-emoji { font-size: 40px; line-height: 1; }
+    .empty-cat h3 { font-size: 18px; font-weight: 700; margin: 10px 0 4px; }
+    .empty-cat p { font-size: 14px; color: var(--text-muted); }
+    .soft-btn { margin-top: 16px; border: none; background: rgba(94, 92, 230, 0.12); color: var(--primary); padding: 12px 18px; border-radius: var(--radius-md); font-size: 15px; font-weight: 700; cursor: pointer; transition: var(--transition); }
+    .soft-btn:active { transform: scale(0.97); }
+
+    .pack-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    @media (min-width: 520px) { .pack-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    @media (min-width: 740px) { .filter-bar { flex-wrap: wrap; margin: 16px 0 0; padding: 4px 0 0; } }
+    .pack-card { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 14px; border-radius: var(--radius-lg); border: 1px solid var(--border); background: var(--background); color: var(--text-main); text-align: right; cursor: pointer; transition: var(--transition); }
+    .pack-card:active { transform: scale(0.97); }
+    .pack-card:hover { border-color: rgba(94, 92, 230, 0.4); }
+    .pack-emoji { font-size: 26px; line-height: 1.2; margin-bottom: 4px; }
+    .pack-name { font-size: 15px; font-weight: 700; }
+    .pack-count { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+    .pack-card.done .pack-count { color: var(--success); }
+    .empty-state .pack-grid { margin-top: 28px; text-align: right; }
+    .empty-state .pack-card { background: var(--surface); box-shadow: var(--shadow-sm); }
+    .pack-detail-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+    .pack-back { display: flex; align-items: center; gap: 4px; border: none; background: none; color: var(--primary); font-size: 15px; font-weight: 700; cursor: pointer; padding: 6px 0; }
+    .pack-toggle-all { border: none; background: none; color: var(--text-muted); font-size: 14px; font-weight: 600; cursor: pointer; padding: 6px 0; }
+    .pack-list { background: var(--background); border-radius: var(--radius-lg); overflow: hidden; }
+    .pack-item { display: flex; align-items: center; padding: 13px 14px; border-bottom: 1px solid var(--border); cursor: pointer; }
+    .pack-item:last-child { border-bottom: none; }
+    .pack-item .checkbox-wrapper { width: 24px; height: 24px; }
+    .pack-item-name { flex: 1; font-size: 16px; font-weight: 600; }
+    .pack-item.exists { cursor: default; }
+    .pack-item.exists .pack-item-name { color: var(--text-muted); }
+    .pack-tag { font-size: 11px; font-weight: 700; color: var(--success); background: rgba(50, 215, 75, 0.12); padding: 2px 8px; border-radius: 8px; }
+    .btn-full:disabled { opacity: 0.45; cursor: default; transform: none; }
+
     .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface-glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 12px 20px calc(12px + env(safe-area-inset-bottom)); box-shadow: 0 -10px 30px rgba(0,0,0,0.05); border-top: 1px solid var(--border); z-index: 100; }
     .bottom-bar-inner { max-width: 700px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
-    
+
     .suggestions { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
     .suggestions::-webkit-scrollbar { display: none; }
+    .suggestions:empty { display: none; }
     .chip { background: var(--surface); border: 1px solid var(--primary); color: var(--primary); padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 4px; }
     .chip:hover, .chip:active { background: var(--primary); color: white; transform: translateY(-2px); }
-    
+
     .input-row { display: flex; gap: 10px; align-items: center; }
-    .input-wrapper { flex: 1; position: relative; }
-    .main-input { width: 100%; background: var(--surface); border: 2px solid transparent; border-radius: var(--radius-lg); padding: 16px 20px; font-size: 17px; box-shadow: var(--shadow-sm); outline: none; transition: var(--transition); }
+    .input-wrapper { flex: 1; min-width: 0; position: relative; }
+    .main-input { width: 100%; background: var(--surface); color: var(--text-main); border: 2px solid transparent; border-radius: var(--radius-lg); padding: 16px 20px; font-size: 17px; font-family: inherit; box-shadow: var(--shadow-sm); outline: none; transition: var(--transition); }
     .main-input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(94, 92, 230, 0.1); }
-    
-    .main-qty-wrapper { display: flex; align-items: center; background: var(--surface); border-radius: var(--radius-lg); padding: 0 5px; box-shadow: var(--shadow-sm); height: 54px; }
+    .main-input::placeholder { color: var(--text-muted); text-overflow: ellipsis; }
+
+    .main-qty-wrapper { display: flex; align-items: center; background: var(--surface); border-radius: var(--radius-lg); padding: 0 5px; box-shadow: var(--shadow-sm); height: 54px; flex-shrink: 0; }
     .main-qty-wrapper .qty-btn { width: 36px; height: 36px; font-size: 20px; }
     .main-qty-wrapper .qty-input { font-size: 18px; width: 36px; }
-    
+    .modal-sheet .main-qty-wrapper { background: var(--background); border: 1px solid var(--border); box-shadow: none; }
+
     .add-btn { background: var(--primary); color: white; border: none; width: 54px; height: 54px; border-radius: var(--radius-lg); font-size: 24px; cursor: pointer; box-shadow: var(--shadow-lg); transition: var(--transition); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .add-btn:active { transform: scale(0.9); box-shadow: none; }
-    
+
     .fab-shop { position: fixed; bottom: 140px; left: 20px; z-index: 90; background: var(--surface); color: var(--text-main); padding: 12px 20px; border-radius: 30px; font-weight: 700; font-size: 15px; box-shadow: var(--shadow-md); border: 1px solid var(--border); display: flex; align-items: center; gap: 8px; cursor: pointer; transition: var(--transition); }
-    body.shopping-mode .fab-shop { background: var(--primary); color: white; border-color: var(--primary); }
-    body.shopping-mode { --surface: #000; --text-main: #fff; --background: #111; --surface-glass: rgba(0,0,0,0.85); --border: #333; }
+    .fab-shop[hidden] { display: none; }
+    body.shopping-mode .fab-shop { background: var(--primary); color: white; border-color: var(--primary); bottom: calc(24px + env(safe-area-inset-bottom)); }
+    body.shopping-mode { --surface: #000; --text-main: #fff; --background: #111; --surface-glass: rgba(0,0,0,0.85); --border: #333; --fill: rgba(118, 118, 128, 0.32); background: #000; animation: none; }
     body.shopping-mode .item-row { padding: 22px 16px; }
+    body.shopping-mode .item-row:active { background: #1c1c1e; }
+    body.shopping-mode .item-row.completed { background: #0a0a0a; }
     body.shopping-mode .item-name { font-size: 22px; }
     body.shopping-mode .checkbox-wrapper { width: 34px; height: 34px; }
     body.shopping-mode .bottom-bar { display: none; }
-    
+    body.shopping-mode .tab-indicator { background: #2C2C2E; }
+    body.shopping-mode .pack-item .checkbox-wrapper { width: 24px; height: 24px; }
+
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 1000; display: flex; align-items: flex-end; justify-content: center; opacity: 0; visibility: hidden; transition: var(--transition); }
     .modal-overlay.active { opacity: 1; visibility: visible; }
-    .modal-sheet { background: var(--surface); width: 100%; max-width: 600px; border-top-left-radius: var(--radius-xl); border-top-right-radius: var(--radius-xl); padding: 24px 20px calc(24px + env(safe-area-inset-bottom)); transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); max-height: 90vh; display: flex; flex-direction: column; }
+    .modal-sheet { background: var(--surface); color: var(--text-main); width: 100%; max-width: 600px; border-top-left-radius: var(--radius-xl); border-top-right-radius: var(--radius-xl); padding: 24px 20px calc(24px + env(safe-area-inset-bottom)); transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); max-height: 90vh; max-height: 90dvh; display: flex; flex-direction: column; }
     .modal-overlay.active .modal-sheet { transform: translateY(0); }
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-shrink: 0; }
     .modal-title { font-size: 20px; font-weight: 800; }
-    .close-btn { background: var(--background); border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 18px; color: var(--text-muted); cursor: pointer; }
-    .modal-body { overflow-y: auto; padding-right: 5px; margin-bottom: 15px; }
+    .close-btn { background: var(--background); border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 18px; color: var(--text-muted); cursor: pointer; flex-shrink: 0; }
+    .modal-body { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; padding-right: 5px; margin-bottom: 15px; }
     .form-group { margin-bottom: 16px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .form-label { display: block; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
-    .form-input, .form-select { width: 100%; background: var(--background); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; font-size: 16px; color: var(--text-main); outline: none; }
+    .form-input, .form-select { width: 100%; background: var(--background); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; font-size: 16px; font-family: inherit; color: var(--text-main); outline: none; }
     .form-input:focus, .form-select:focus { border-color: var(--primary); }
+    textarea.form-input { resize: vertical; min-height: 72px; line-height: 1.4; }
+    .input-affix { position: relative; }
+    .input-affix .form-input { padding-inline-end: 38px; height: 54px; }
+    .input-affix .affix { position: absolute; inset-inline-end: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-weight: 700; pointer-events: none; }
+    .form-hint { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+    .subtotal-hint { margin: -8px 0 14px; font-weight: 600; }
+    .subtotal-hint:empty { display: none; }
+    .seg { display: flex; padding: 3px; gap: 2px; background: var(--background); border: 1px solid var(--border); border-radius: var(--radius-md); }
+    .seg button { flex: 1; border: none; background: none; padding: 10px 4px; border-radius: 9px; font-size: 14px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: var(--transition); }
+    .seg button.active { background: var(--surface); color: var(--text-main); box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    .seg button[data-p="high"].active { color: var(--danger); }
+    .home-only { display: none; }
+    body.tab-home .home-only { display: block; }
+    body.tab-home .grocery-only { display: none; }
     .btn-full { width: 100%; background: var(--primary); color: white; border: none; padding: 16px; border-radius: var(--radius-md); font-size: 17px; font-weight: 700; cursor: pointer; margin-top: 10px; transition: var(--transition); flex-shrink: 0; }
     .btn-full:active { transform: scale(0.98); }
     .btn-danger { background: rgba(255, 69, 58, 0.1); color: var(--danger); margin-top: 10px; }
+    .btn-soft { background: rgba(94, 92, 230, 0.12); color: var(--primary); }
     .settings-section-title { font-size: 16px; font-weight: 800; margin: 24px 0 12px; color: var(--text-main); border-bottom: 1px solid var(--border); padding-bottom: 8px; }
     .cat-edit-row { display: flex; gap: 10px; margin-bottom: 10px; }
     .cat-edit-input { flex: 1; padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--background); font-size: 15px; font-family: inherit; color: var(--text-main); outline: none; }
@@ -160,18 +292,44 @@
     body.shopping-mode .hl { background: rgba(255, 159, 10, 0.45); }
     .item-row.completed .item-name .hl { text-decoration: line-through; }
 
-    .empty-state { text-align: center; padding: 60px 20px; animation: slideUpFade 0.4s ease; }
+    .toast { position: fixed; left: 50%; bottom: calc(200px + env(safe-area-inset-bottom)); z-index: 1100; display: flex; align-items: center; gap: 14px; max-width: calc(100% - 32px); padding: 12px 14px 12px 18px; border-radius: 16px; background: rgba(28, 28, 30, 0.94); color: #fff; font-size: 15px; font-weight: 600; box-shadow: 0 12px 30px rgba(0,0,0,0.25); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); opacity: 0; visibility: hidden; transform: translate(-50%, 16px); transition: var(--transition); }
+    .toast.show { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+    body.shopping-mode .toast { bottom: calc(90px + env(safe-area-inset-bottom)); background: #2C2C2E; }
+    .toast-msg { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .toast-action { flex-shrink: 0; border: none; background: none; color: #A9A8FF; font-size: 15px; font-weight: 800; cursor: pointer; padding: 4px 6px; }
+    .toast-action[hidden] { display: none; }
+
+    .empty-state { text-align: center; padding: 60px 20px; }
     .empty-state svg { width: 64px; height: 64px; color: var(--primary); margin-bottom: 16px; opacity: 0.8; }
     .empty-state h3 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
     .empty-state p { color: var(--text-muted); font-size: 15px; }
+    .empty-state.home-empty { padding: 36px 0 20px; }
+    .empty-state .es-emoji { font-size: 56px; line-height: 1; margin-bottom: 14px; }
     @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 380px) {
+        .title-area h1 { font-size: 24px; }
+        .tab-btn { font-size: 14px; gap: 4px; }
+        .home-summary { padding: 16px; }
+        .sum-amount { font-size: 28px; }
+        .sum-pack-btn { padding: 7px 10px; font-size: 12px; }
+        .sum-stats { gap: 6px; margin-top: 12px; }
+        .sum-stat { padding: 8px 9px; }
+        .sum-stat span { font-size: 11px; }
+        .sum-stat b { font-size: 14px; }
+        .main-input { font-size: 16px; }
+        .main-qty-wrapper .qty-btn { width: 30px; }
+        .main-qty-wrapper .qty-input { width: 28px; }
+        .main-input { padding: 16px 14px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
 </style>
-```
 
 </head>
 <body>
 
-```
 <header id="header">
     <div class="header-content">
         <div class="title-area">
@@ -185,11 +343,21 @@
             <button class="action-btn" id="search-btn" onclick="App.toggleSearch()" aria-label="חיפוש מוצר">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             </button>
-            <button class="action-btn" id="menu-btn" onclick="App.openSettings()">
+            <button class="action-btn" id="menu-btn" onclick="App.openSettings()" aria-label="אפשרויות">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
             </button>
         </div>
     </div>
+
+    <nav class="tabs" role="tablist" aria-label="רשימות">
+        <div class="tab-indicator"></div>
+        <button class="tab-btn active" id="tab-grocery" role="tab" aria-selected="true" onclick="App.switchTab('grocery')">
+            <span class="tab-emoji">🛒</span> סופר <span class="tab-badge" id="badge-grocery"></span>
+        </button>
+        <button class="tab-btn" id="tab-home" role="tab" aria-selected="false" onclick="App.switchTab('home')">
+            <span class="tab-emoji">🛋️</span> ריהוט וציוד לבית <span class="tab-badge" id="badge-home"></span>
+        </button>
+    </nav>
 
     <div class="search-row" id="search-row">
         <div class="search-wrapper">
@@ -201,7 +369,8 @@
     </div>
 </header>
 
-<main class="container">
+<main class="container" id="main">
+    <div class="filter-bar" id="filter-bar" role="toolbar" aria-label="סינון לפי קטגוריה"></div>
     <div class="list-area" id="list-container"></div>
 </main>
 
@@ -215,14 +384,14 @@
         <div class="suggestions" id="suggestions-box"></div>
         <div class="input-row">
             <div class="input-wrapper">
-                <input type="text" id="main-input" class="main-input" placeholder="מה חסר בבית?" autocomplete="off" inputmode="text">
+                <input type="text" id="main-input" class="main-input" placeholder="מה חסר בבית?" autocomplete="off" inputmode="text" enterkeyhint="done">
             </div>
             <div class="main-qty-wrapper">
-                <button class="qty-btn" onclick="App.changeMainQty(-1)">-</button>
-                <input type="number" class="qty-input" id="main-qty" value="1" min="1" onchange="App.setMainQty(this.value)">
-                <button class="qty-btn" onclick="App.changeMainQty(1)">+</button>
+                <button class="qty-btn" onclick="App.changeMainQty(-1)" aria-label="הפחת כמות">-</button>
+                <input type="number" class="qty-input" id="main-qty" value="1" min="1" onchange="App.setMainQty(this.value)" aria-label="כמות">
+                <button class="qty-btn" onclick="App.changeMainQty(1)" aria-label="הוסף כמות">+</button>
             </div>
-            <button class="add-btn" onclick="App.addFromInput()">
+            <button class="add-btn" onclick="App.addFromInput()" aria-label="הוסף לרשימה">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             </button>
         </div>
@@ -230,42 +399,69 @@
 </div>
 
 <div class="modal-overlay" id="edit-modal">
-    <div class="modal-sheet">
+    <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="edit-title">
         <div class="modal-header">
-            <div class="modal-title">עריכת מוצר</div>
-            <button class="close-btn" onclick="App.closeEdit()">&times;</button>
+            <div class="modal-title" id="edit-title">עריכת מוצר</div>
+            <button class="close-btn" onclick="App.closeEdit()" aria-label="סגור">&times;</button>
         </div>
         <div class="modal-body">
             <input type="hidden" id="edit-id">
             <div class="form-group">
-                <label class="form-label">שם המוצר</label>
+                <label class="form-label" for="edit-name">שם המוצר</label>
                 <input type="text" id="edit-name" class="form-input">
             </div>
-            <div class="form-group">
-                <label class="form-label">כמות</label>
-                <div class="main-qty-wrapper" style="width: 100%; justify-content: space-between; padding: 0 20px;">
-                    <button class="qty-btn" onclick="App.changeEditQty(-1)">-</button>
-                    <input type="number" class="qty-input" id="edit-qty" value="1" min="1" onchange="App.setEditQty(this.value)">
-                    <button class="qty-btn" onclick="App.changeEditQty(1)">+</button>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">כמות</label>
+                    <div class="main-qty-wrapper" style="width: 100%; justify-content: space-between; padding: 0 10px;">
+                        <button class="qty-btn" onclick="App.changeEditQty(-1)" aria-label="הפחת כמות">-</button>
+                        <input type="number" class="qty-input" id="edit-qty" value="1" min="1" onchange="App.setEditQty(this.value)" aria-label="כמות">
+                        <button class="qty-btn" onclick="App.changeEditQty(1)" aria-label="הוסף כמות">+</button>
+                    </div>
+                </div>
+                <div class="form-group home-only">
+                    <label class="form-label" for="edit-price">מחיר ליחידה</label>
+                    <div class="input-affix">
+                        <input type="text" id="edit-price" class="form-input" inputmode="decimal" placeholder="0" autocomplete="off">
+                        <span class="affix">₪</span>
+                    </div>
                 </div>
             </div>
+            <div class="form-hint subtotal-hint" id="edit-subtotal"></div>
             <div class="form-group">
-                <label class="form-label">קטגוריה</label>
+                <label class="form-label" for="edit-category">קטגוריה</label>
                 <select id="edit-category" class="form-select"></select>
             </div>
+            <div class="form-group home-only">
+                <label class="form-label">עדיפות</label>
+                <div class="seg" id="edit-priority">
+                    <button type="button" data-p="high" onclick="App.setEditPriority('high')">🔥 דחוף</button>
+                    <button type="button" data-p="normal" onclick="App.setEditPriority('normal')">רגיל</button>
+                    <button type="button" data-p="low" onclick="App.setEditPriority('low')">יכול לחכות</button>
+                </div>
+            </div>
+            <div class="form-group home-only">
+                <label class="form-label" for="edit-link">קישור למוצר</label>
+                <input type="url" id="edit-link" class="form-input" inputmode="url" placeholder="https://..." dir="ltr" autocomplete="off" style="text-align: right;">
+            </div>
+            <div class="form-group home-only">
+                <label class="form-label" for="edit-note">הערות (מידות, צבע, חנות...)</label>
+                <textarea id="edit-note" class="form-input" rows="2"></textarea>
+            </div>
         </div>
-        <button class="btn-full" onclick="App.saveEdit()">שמור שינויים (ולמד)</button>
+        <button class="btn-full" id="edit-save-btn" onclick="App.saveEdit()">שמור שינויים (ולמד)</button>
         <button class="btn-full btn-danger" onclick="App.deleteFromEdit()">מחק מוצר</button>
     </div>
 </div>
 
 <div class="modal-overlay" id="settings-modal">
-    <div class="modal-sheet">
+    <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="settings-title">
         <div class="modal-header">
-            <div class="modal-title">אפשרויות</div>
-            <button class="close-btn" onclick="document.getElementById('settings-modal').classList.remove('active')">&times;</button>
+            <div class="modal-title" id="settings-title">אפשרויות</div>
+            <button class="close-btn" onclick="App.closeModal(App.dom.settingsModal)" aria-label="סגור">&times;</button>
         </div>
         <div class="modal-body">
+            <button class="btn-full btn-soft home-only" onclick="App.closeModal(App.dom.settingsModal); App.openPacks()">✨ הוספת רשימה מוכנה לפי חדר</button>
             <button class="btn-full btn-danger" onclick="App.clearList()">נקה את כל הרשימה</button>
             <button class="btn-full btn-danger" onclick="App.clearCompleted()" style="background: rgba(255, 159, 10, 0.1); color: var(--secondary);">מחק מוצרים שנקנו</button>
 
@@ -276,6 +472,22 @@
     </div>
 </div>
 
+<div class="modal-overlay" id="packs-modal">
+    <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="packs-title">
+        <div class="modal-header">
+            <div class="modal-title" id="packs-title">רשימות מוכנות</div>
+            <button class="close-btn" onclick="App.closeModal(App.dom.packsModal)" aria-label="סגור">&times;</button>
+        </div>
+        <div class="modal-body" id="packs-body"></div>
+        <button class="btn-full" id="packs-add-btn" onclick="App.addSelectedPack()" hidden>הוסף</button>
+    </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+    <span class="toast-msg"></span>
+    <button class="toast-action" hidden></button>
+</div>
+
 <script>
     const DEFAULT_CATEGORIES = {
         PRODUCE: '🍎 ירקות ופירות', PROTEIN: '🥩 בשר, עוף ודגים', DAIRY: '🧀 חלב, ביצים וחלבון',
@@ -283,19 +495,70 @@
         SNACKS: '🥨 חטיפים ומתוקים', DRINKS: '🧃 משקאות', HOUSEHOLD: '🧼 פארם וחיות מחמד', OTHER: '📦 אחר'
     };
 
+    const HOME_CATEGORIES = {
+        LIVING: '🛋️ סלון', KITCHEN: '🍽️ מטבח ופינת אוכל', BEDROOM: '🛏️ חדר שינה', BATH: '🛁 חדר רחצה',
+        KIDS: '🧸 חדר ילדים', OFFICE: '💻 חדר עבודה', BALCONY: '🌿 מרפסת וגינה', ELECTRIC: '🔌 מוצרי חשמל',
+        TEXTILE: '🧺 טקסטיל ומצעים', DECOR: '💡 תאורה ועיצוב', STORAGE: '🧰 אחסון, כלים ותחזוקה', OTHER: '📦 אחר'
+    };
+
+    // Ready-made checklists per room, used by the "רשימות מוכנות" sheet and by the per-category suggestion chips
+    const HOME_PACKS = {
+        LIVING: ['ספה', 'כורסה', 'שולחן סלון', 'מזנון טלוויזיה', 'שטיח לסלון', 'מנורה עומדת', 'וילונות לסלון', 'כריות נוי', 'ספרייה'],
+        KITCHEN: ['שולחן אוכל', 'כיסאות אוכל', 'סט סירים', 'מחבת', 'סט סכו"ם', 'סט צלחות', 'כוסות', 'קערות', 'סט סכינים', 'קרש חיתוך', 'מתקן ייבוש כלים', 'פח אשפה', 'קופסאות אחסון למזון'],
+        BEDROOM: ['מיטה זוגית', 'מזרן', 'ארון בגדים', 'שידות לילה', 'שידה', 'מראה', 'קולבים', 'מנורת לילה'],
+        BATH: ['מתלה מגבות', 'וילון מקלחת', 'שטיחון אמבטיה', 'סבוניה', 'כוס למברשות שיניים', 'סל כביסה', 'ארון אמבטיה', 'מברשת אסלה'],
+        KIDS: ['מיטת ילדים', 'מזרן לילדים', 'שידת החתלה', 'ארון לילדים', 'שולחן וכיסאות לילדים', 'ארגז צעצועים', 'מנורת לילה לילדים', 'שטיח משחק'],
+        OFFICE: ['שולחן עבודה', 'כיסא משרדי', 'מסך מחשב', 'מנורת שולחן', 'מדפסת', 'מקלדת ועכבר', 'מעמד ללפטופ', 'מפצל חשמל'],
+        BALCONY: ['שולחן מרפסת', 'כיסאות גינה', 'עציצים', 'צינור השקיה', 'מנגל', 'ערסל', 'תאורה למרפסת'],
+        ELECTRIC: ['מקרר', 'מכונת כביסה', 'מייבש כביסה', 'מדיח כלים', 'תנור', 'כיריים', 'מיקרוגל', 'קומקום', 'טוסטר', 'שואב אבק', 'מזגן', 'טלוויזיה', 'מכונת קפה'],
+        TEXTILE: ['סט מצעים', 'שמיכת פוך', 'כריות שינה', 'מגן מזרן', 'מגבות רחצה', 'מגבות מטבח', 'וילונות', 'מפת שולחן', 'שמיכה לספה'],
+        DECOR: ['נברשת', 'גופי תאורה', 'תמונות לקיר', 'מסגרות', 'עציץ', 'אגרטל', 'שעון קיר', 'נרות ריחניים'],
+        STORAGE: ['ארגז כלים', 'מקדחה', 'סט מברגים', 'סולם', 'כבל מאריך', 'נורות', 'מתלה כביסה', 'קרש גיהוץ', 'מטאטא ויעה', 'מגב ודלי', 'קופסאות אחסון']
+    };
+
+    const LISTS = {
+        grocery: {
+            collection: 'grocery_list', itemsKey: 'premium_grocery_items_v1', catsKey: 'premium_grocery_cats_v1', dictKey: 'premium_learned_dict_v1',
+            defaultCats: DEFAULT_CATEGORIES, placeholder: 'מה חסר בבית?', searchPlaceholder: 'חפש מוצר ברשימה',
+            editTitle: 'עריכת מוצר', saveLabel: 'שמור שינויים (ולמד)', deleteLabel: 'מחק מוצר', settingsTitle: 'אפשרויות · סופר'
+        },
+        home: {
+            collection: 'home_list', itemsKey: 'premium_home_items_v1', catsKey: 'premium_home_cats_v1', dictKey: 'premium_home_learned_v1',
+            defaultCats: HOME_CATEGORIES, placeholder: 'מה צריך לבית?', searchPlaceholder: 'חפש פריט, חדר או הערה',
+            editTitle: 'עריכת פריט', saveLabel: 'שמור שינויים', deleteLabel: 'מחק פריט', settingsTitle: 'אפשרויות · ריהוט וציוד לבית'
+        }
+    };
+
+    // localStorage can throw (private mode, blocked storage) — never let that break the app
+    const store = {
+        get(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch (e) { return fallback; } },
+        set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {} }
+    };
+
     const App = {
         state: {
-            items: [],
-            categories: JSON.parse(localStorage.getItem('premium_grocery_cats_v1')) || DEFAULT_CATEGORIES,
-            // Load the learned dictionary from localStorage so it persists between sessions
-            learnedDict: JSON.parse(localStorage.getItem('premium_learned_dict_v1')) || {},
+            tab: 'grocery',
+            lists: Object.fromEntries(Object.entries(LISTS).map(([key, cfg]) => [key, {
+                items: store.get(cfg.itemsKey, []),
+                categories: { ...cfg.defaultCats, ...store.get(cfg.catsKey, {}) },
+                // Load the learned dictionary from localStorage so it persists between sessions
+                learnedDict: store.get(cfg.dictKey, {})
+            }])),
             mainQty: 1,
             editQty: 1,
+            editPriority: 'normal',
             shoppingMode: false,
             isOnline: false,
             searchOpen: false,
-            search: ''
+            search: '',
+            homeFilter: 'ALL',
+            collapsed: store.get('premium_home_collapsed_v1', {}),
+            animate: true
         },
+
+        get list() { return this.state.lists[this.state.tab]; },
+        get cfg() { return LISTS[this.state.tab]; },
+        get isHome() { return this.state.tab === 'home'; },
 
         // SMART_DICT contains roots and bases to catch plurals and variations
         SMART_DICT: {
@@ -305,7 +568,7 @@
             'חס': 'PRODUCE', 'פטרי': 'PRODUCE', 'לימון': 'PRODUCE', 'אבוקדו': 'PRODUCE', 'תפוז': 'PRODUCE', 'קלמנטינ': 'PRODUCE',
             'אבטיח': 'PRODUCE', 'מלון': 'PRODUCE', 'ענב': 'PRODUCE', 'שזיף': 'PRODUCE', 'אפרסק': 'PRODUCE', 'פטרוזילי': 'PRODUCE',
             'כוסבר': 'PRODUCE', 'שמיר': 'PRODUCE', 'סלרי': 'PRODUCE', 'נענע': 'PRODUCE', 'מנגו': 'PRODUCE', 'אננס': 'PRODUCE', 'תות': 'PRODUCE',
-            'סלק': 'PRODUCE', 'צנון': 'PRODUCE', 'קולורבי': 'PRODUCE', 'מנגולד': 'PRODUCE', 'תרד': 'PRODUCE', 'בזיל': 'PRODUCE', 'רימון': 'PRODUCE', 
+            'סלק': 'PRODUCE', 'צנון': 'PRODUCE', 'קולורבי': 'PRODUCE', 'מנגולד': 'PRODUCE', 'תרד': 'PRODUCE', 'בזיל': 'PRODUCE', 'רימון': 'PRODUCE',
             'קיווי': 'PRODUCE', 'דובדבנ': 'PRODUCE', 'ירק': 'PRODUCE', 'פרי': 'PRODUCE', 'שומר': 'PRODUCE',
 
             // PROTEIN
@@ -363,95 +626,191 @@
             'מזון ל': 'HOUSEHOLD', 'חול ל': 'HOUSEHOLD', 'פארם': 'HOUSEHOLD', 'גלייד': 'HOUSEHOLD', 'אשפ': 'HOUSEHOLD'
         },
 
+        // Same idea for the home list. Hebrew final letters (ן ם ץ ך ף) change in plurals, so both forms are listed where needed.
+        // Longer keys win, so 'שולחן אוכל' beats 'שולחן' and 'מגבת' beats 'מגב'.
+        HOME_DICT: {
+            // LIVING
+            'ספה': 'LIVING', 'ספות': 'LIVING', 'כורס': 'LIVING', 'שולחן': 'LIVING', 'שולחנ': 'LIVING', 'שולחן סלון': 'LIVING', 'שולחן קפה': 'LIVING',
+            'מזנון': 'LIVING', 'שידת טלוויזיה': 'LIVING', 'שידת טלויזיה': 'LIVING', 'פוף': 'LIVING', 'הדום': 'LIVING', 'ספרי': 'LIVING',
+            'כוננית': 'LIVING', 'מדף ספרים': 'LIVING', 'שזלונג': 'LIVING', 'סלון': 'LIVING', 'ארון נעליים': 'LIVING', 'מתלה מעילים': 'LIVING',
+
+            // KITCHEN
+            'שולחן אוכל': 'KITCHEN', 'פינת אוכל': 'KITCHEN', 'כיסא': 'KITCHEN', 'כסא': 'KITCHEN', 'שרפרף': 'KITCHEN', 'כיסא בר': 'KITCHEN',
+            'סיר': 'KITCHEN', 'מחבת': 'KITCHEN', 'סכו"ם': 'KITCHEN', 'סכום': 'KITCHEN', 'צלחת': 'KITCHEN', 'צלחות': 'KITCHEN', 'כוס': 'KITCHEN',
+            'ספל': 'KITCHEN', 'קער': 'KITCHEN', 'קרש חיתוך': 'KITCHEN', 'סכין': 'KITCHEN', 'סכינ': 'KITCHEN', 'מגש': 'KITCHEN', 'תבני': 'KITCHEN', 'תבנית': 'KITCHEN',
+            'מערוך': 'KITCHEN', 'מסננת': 'KITCHEN', 'קולפן': 'KITCHEN', 'פומפי': 'KITCHEN', 'מצקת': 'KITCHEN', 'מרית': 'KITCHEN', 'קנקן': 'KITCHEN',
+            'מתקן ייבוש': 'KITCHEN', 'מייבש כלים': 'KITCHEN', 'פח אשפה': 'KITCHEN', 'פח': 'KITCHEN', 'קופסאות אוכל': 'KITCHEN', 'אחסון למזון': 'KITCHEN',
+            'מגבת מטבח': 'KITCHEN', 'מדף תבלינים': 'KITCHEN', 'כלי הגשה': 'KITCHEN', 'מטבח': 'KITCHEN',
+
+            // BEDROOM
+            'מיטה': 'BEDROOM', 'מיטות': 'BEDROOM', 'מיטת': 'BEDROOM', 'מזרן': 'BEDROOM', 'מזרנ': 'BEDROOM', 'מזרון': 'BEDROOM', 'ארון': 'BEDROOM', 'ארונ': 'BEDROOM',
+            'ארון בגדים': 'BEDROOM', 'שידה': 'BEDROOM', 'שידות': 'BEDROOM', 'שידת': 'BEDROOM', 'קולב': 'BEDROOM', 'מראה': 'BEDROOM', 'ראש מיטה': 'BEDROOM',
+            'בסיס למיטה': 'BEDROOM', 'טואלט': 'BEDROOM', 'מתלה בגדים': 'BEDROOM', 'חדר שינה': 'BEDROOM',
+
+            // BATH
+            'אמבטי': 'BATH', 'מקלחת': 'BATH', 'וילון מקלחת': 'BATH', 'שטיחון אמבטיה': 'BATH', 'סבוני': 'BATH', 'מתקן סבון': 'BATH',
+            'מתקן מגבות': 'BATH', 'מתלה מגבות': 'BATH', 'סל כביסה': 'BATH', 'סלסלת כביסה': 'BATH', 'סל לכביסה': 'BATH', 'אסלה': 'BATH',
+            'ראש מקלחת': 'BATH', 'מברשת אסלה': 'BATH', 'מברשות שיניים': 'BATH', 'רחצה': 'BATH', 'משקל': 'BATH',
+
+            // KIDS
+            'תינוק': 'KIDS', 'עריסה': 'KIDS', 'לול': 'KIDS', 'שידת החתלה': 'KIDS', 'החתלה': 'KIDS', 'צעצוע': 'KIDS', 'משחק': 'KIDS',
+            'כיסא אוכל לתינוק': 'KIDS', 'בימבה': 'KIDS', 'עגל': 'KIDS', 'סלקל': 'KIDS', 'מנשא': 'KIDS', 'ילדים': 'KIDS', 'לילדים': 'KIDS',
+            'פאזל': 'KIDS', 'לגו': 'KIDS', 'בייבי': 'KIDS',
+
+            // OFFICE
+            'שולחן עבודה': 'OFFICE', 'שולחן כתיבה': 'OFFICE', 'שולחן מחשב': 'OFFICE', 'כיסא משרדי': 'OFFICE', 'כסא משרדי': 'OFFICE',
+            'כיסא מחשב': 'OFFICE', 'כסא מחשב': 'OFFICE', 'כיסא גיימינג': 'OFFICE', 'כסא גיימינג': 'OFFICE', 'מסך': 'OFFICE', 'מסכים': 'OFFICE',
+            'מחשב': 'OFFICE', 'לפטופ': 'OFFICE', 'מדפסת': 'OFFICE', 'מקלדת': 'OFFICE', 'עכבר': 'OFFICE', 'מנורת שולחן': 'OFFICE', 'משרד': 'OFFICE',
+
+            // BALCONY
+            'מרפסת': 'BALCONY', 'גינה': 'BALCONY', 'גינון': 'BALCONY', 'כיסא גינה': 'BALCONY', 'כסא גינה': 'BALCONY', 'כיסאות גינה': 'BALCONY', 'כסאות גינה': 'BALCONY',
+            'ערסל': 'BALCONY', 'נדנדה': 'BALCONY', 'מנגל': 'BALCONY', 'צינור': 'BALCONY', 'ממטרה': 'BALCONY', 'שמשי': 'BALCONY',
+            'דשא': 'BALCONY', 'אדנית': 'BALCONY', 'פרגולה': 'BALCONY', 'ספסל גן': 'BALCONY', 'ספת גן': 'BALCONY', 'השקיה': 'BALCONY',
+
+            // ELECTRIC
+            'מקרר': 'ELECTRIC', 'מקפיא': 'ELECTRIC', 'מכונת כביסה': 'ELECTRIC', 'מייבש כביסה': 'ELECTRIC', 'מייבש': 'ELECTRIC', 'מדיח': 'ELECTRIC',
+            'תנור': 'ELECTRIC', 'כיריים': 'ELECTRIC', 'מיקרו': 'ELECTRIC', 'קומקום': 'ELECTRIC', 'טוסטר': 'ELECTRIC', 'בלנדר': 'ELECTRIC',
+            'מיקסר': 'ELECTRIC', 'מעבד מזון': 'ELECTRIC', 'מכונת קפה': 'ELECTRIC', 'שואב': 'ELECTRIC', 'רובוט': 'ELECTRIC', 'מזגן': 'ELECTRIC', 'מזגנ': 'ELECTRIC',
+            'מאוורר': 'ELECTRIC', 'מפזר חום': 'ELECTRIC', 'רדיאטור': 'ELECTRIC', 'טלוויזי': 'ELECTRIC', 'טלויזי': 'ELECTRIC', 'מסך טלוויזיה': 'ELECTRIC',
+            'מקרן': 'ELECTRIC', 'רמקול': 'ELECTRIC', 'סאונדבר': 'ELECTRIC', 'פן שיער': 'ELECTRIC', 'מייבש שיער': 'ELECTRIC', 'מחליק': 'ELECTRIC',
+            'מגהץ': 'ELECTRIC', 'מכונת לחם': 'ELECTRIC', 'סיר לחץ': 'ELECTRIC', 'סיר בישול איטי': 'ELECTRIC', 'סיר אורז': 'ELECTRIC',
+            'סודה סטרים': 'ELECTRIC', 'סודהסטרים': 'ELECTRIC', 'מטהר אוויר': 'ELECTRIC', 'מסיר לחות': 'ELECTRIC', 'פלטה': 'ELECTRIC',
+            'שעון שבת': 'ELECTRIC', 'אייר פרייר': 'ELECTRIC', 'נינג': 'ELECTRIC', 'גריל': 'ELECTRIC', 'ראוטר': 'ELECTRIC', 'חשמלי': 'ELECTRIC',
+
+            // TEXTILE
+            'מצע': 'TEXTILE', 'סדין': 'TEXTILE', 'סדינ': 'TEXTILE', 'ציפי': 'TEXTILE', 'ציפה': 'TEXTILE', 'ציפות': 'TEXTILE', 'שמיכ': 'TEXTILE',
+            'פוך': 'TEXTILE', 'כרית': 'TEXTILE', 'כריות': 'TEXTILE', 'מגבת': 'TEXTILE', 'מגבות': 'TEXTILE', 'וילון': 'TEXTILE', 'וילונ': 'TEXTILE',
+            'מפת': 'TEXTILE', 'מפות': 'TEXTILE', 'מפה': 'TEXTILE', 'מגן מזרן': 'TEXTILE', 'מגן מזרון': 'TEXTILE', 'שטיח': 'TEXTILE',
+            'חלוק': 'TEXTILE', 'כיסוי לספה': 'TEXTILE', 'ראנר': 'TEXTILE', 'פלייד': 'TEXTILE', 'שמיכת פיקה': 'TEXTILE',
+
+            // DECOR
+            'מנורה': 'DECOR', 'מנורות': 'DECOR', 'מנורת': 'DECOR', 'נברש': 'DECOR', 'גוף תאורה': 'DECOR', 'גופי תאורה': 'DECOR', 'תאורה': 'DECOR',
+            'אהיל': 'DECOR', 'ספוט': 'DECOR', 'פס לד': 'DECOR', 'רצועת לד': 'DECOR', 'תמונה': 'DECOR', 'תמונות': 'DECOR', 'מסגרת': 'DECOR', 'מסגרות': 'DECOR',
+            'פוסטר': 'DECOR', 'אגרטל': 'DECOR', 'נרות': 'DECOR', 'נר ריחני': 'DECOR', 'עציץ': 'DECOR', 'עציצ': 'DECOR', 'צמח': 'DECOR', 'שעון': 'DECOR',
+            'פסל': 'DECOR', 'מפיץ ריח': 'DECOR', 'קישוט': 'DECOR', 'מדבק': 'DECOR', 'ציור': 'DECOR', 'דקור': 'DECOR',
+
+            // STORAGE
+            'מקדח': 'STORAGE', 'מברג': 'STORAGE', 'פטיש': 'STORAGE', 'בורג': 'STORAGE', 'ברגים': 'STORAGE', 'דיבל': 'STORAGE', 'סולם': 'STORAGE',
+            'ארגז': 'STORAGE', 'ארגז כלים': 'STORAGE', 'סרט מדידה': 'STORAGE', 'פלס': 'STORAGE', 'דבק': 'STORAGE', 'סיליקון': 'STORAGE',
+            'צבע': 'STORAGE', 'רולר': 'STORAGE', 'מפצל': 'STORAGE', 'מאריך': 'STORAGE', 'נורה': 'STORAGE', 'נורות': 'STORAGE', 'סולל': 'STORAGE',
+            'מנעול': 'STORAGE', 'ידית': 'STORAGE', 'קופס': 'STORAGE', 'סל אחסון': 'STORAGE', 'אחסון': 'STORAGE', 'מדף': 'STORAGE', 'מדפ': 'STORAGE',
+            'מתלה': 'STORAGE', 'מגירה': 'STORAGE', 'מארגנ': 'STORAGE', 'מארגן': 'STORAGE', 'קרש גיהוץ': 'STORAGE', 'מתקן ייבוש כביסה': 'STORAGE',
+            'מתלה כביסה': 'STORAGE', 'מטאטא': 'STORAGE', 'מגב': 'STORAGE', 'יעה': 'STORAGE', 'דלי': 'STORAGE', 'כלי עבודה': 'STORAGE'
+        },
+
         SUGGESTIONS: ['חלב', 'ביצים', 'לחם', 'עגבניות', 'מלפפונים', 'חזה עוף', 'אורז', 'קפה', 'נייר טואלט', 'מים'],
-        DB_COLLECTION: 'grocery_list',
+        HOME_SUGGESTIONS: ['ספה', 'שולחן אוכל', 'מיטה זוגית', 'מזרן', 'ארון בגדים', 'מקרר', 'מכונת כביסה', 'שטיח לסלון', 'מנורה עומדת', 'וילונות', 'סט מצעים', 'מגבות רחצה'],
 
         init() {
             // Sort dictionary keys by length descending so longer words match first (e.g., 'חלב סויה' before 'חלב')
-            this.sortedDictKeys = Object.keys(this.SMART_DICT).sort((a, b) => b.length - a.length);
+            const byLength = dict => Object.keys(dict).sort((a, b) => b.length - a.length);
+            this.dicts = { grocery: this.SMART_DICT, home: this.HOME_DICT };
+            this.sortedDictKeys = { grocery: byLength(this.SMART_DICT), home: byLength(this.HOME_DICT) };
+            this.money = new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS', maximumFractionDigits: 0 });
             this.cacheDOM();
             this.bindEvents();
-            this.populateCategories();
+
+            const fromHash = location.hash.slice(1);
+            const initialTab = LISTS[fromHash] ? fromHash : (LISTS[store.get('premium_active_tab', 'grocery')] ? store.get('premium_active_tab', 'grocery') : 'grocery');
+            this.switchTab(initialTab, { initial: true });
             this.initData();
         },
 
         initData() {
+            // The Firebase module runs before DOMContentLoaded; the short wait only covers slow CDN loads.
+            // Cached items are already on screen in the meantime.
             setTimeout(() => {
                 if (window.firebaseDb && window.firebaseDocs) {
                     this.state.isOnline = true;
-                    document.getElementById('sync-status').textContent = 'מחובר לענן';
-                    document.getElementById('sync-status').classList.add('online');
-                    this.setupFirebaseSync();
-                } else {
-                    this.state.items = JSON.parse(localStorage.getItem('premium_grocery_items_v1')) || [];
-                    this.render();
+                    this.dom.syncStatus.textContent = 'מחובר לענן';
+                    this.dom.syncStatus.classList.add('online');
+                    Object.keys(LISTS).forEach(key => this.setupFirebaseSync(key));
                 }
-            }, 1000);
+            }, window.firebaseDb ? 0 : 1000);
         },
 
-        setupFirebaseSync() {
+        setupFirebaseSync(key) {
             const { collection, onSnapshot } = window.firebaseDocs;
-            const itemsRef = collection(window.firebaseDb, this.DB_COLLECTION);
-            
+            const itemsRef = collection(window.firebaseDb, LISTS[key].collection);
+
             onSnapshot(itemsRef, (snapshot) => {
                 const items = [];
                 snapshot.forEach((doc) => {
                     items.push({ id: doc.id, ...doc.data() });
                 });
-                this.state.items = items;
-                localStorage.setItem('premium_grocery_items_v1', JSON.stringify(items));
-                this.render();
+                this.state.lists[key].items = items;
+                store.set(LISTS[key].itemsKey, items);
+                if (key === this.state.tab) this.render();
+                else this.updateBadges();
             }, (error) => {
                 console.error("Firebase sync error:", error);
-                document.getElementById('sync-status').textContent = 'שגיאת סנכרון';
-                document.getElementById('sync-status').classList.remove('online');
+                this.dom.syncStatus.textContent = 'שגיאת סנכרון';
+                this.dom.syncStatus.classList.remove('online');
             });
         },
 
-        async saveItem(item) {
-            const index = this.state.items.findIndex(i => i.id === item.id);
-            if (index > -1) this.state.items[index] = item;
-            else this.state.items.push(item);
+        uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); },
+
+        // Firestore rejects undefined values
+        clean(data) { return Object.fromEntries(Object.entries(data).filter(([, v]) => v !== undefined)); },
+
+        async saveItem(item, key = this.state.tab) {
+            const list = this.state.lists[key];
+            const index = list.items.findIndex(i => i.id === item.id);
+            if (index > -1) list.items[index] = item;
+            else list.items.push(item);
+            store.set(LISTS[key].itemsKey, list.items);
             this.render();
 
             if (this.state.isOnline) {
                 const { doc, setDoc } = window.firebaseDocs;
                 try {
                     const { id, ...data } = item;
-                    await setDoc(doc(window.firebaseDb, this.DB_COLLECTION, item.id), data);
-                } catch (e) { console.error("Error saving to Firebase:", e); }
-            } else {
-                localStorage.setItem('premium_grocery_items_v1', JSON.stringify(this.state.items));
+                    await setDoc(doc(window.firebaseDb, LISTS[key].collection, item.id), this.clean(data));
+                } catch (e) { console.error("Error saving to Firebase:", e); this.toast('השמירה לענן נכשלה'); }
             }
         },
 
-        async deleteItem(id) {
-            this.state.items = this.state.items.filter(i => i.id !== id);
+        async saveMany(items, key = this.state.tab) {
+            if (!items.length) return;
+            const list = this.state.lists[key];
+            items.forEach(item => {
+                const index = list.items.findIndex(i => i.id === item.id);
+                if (index > -1) list.items[index] = item;
+                else list.items.push(item);
+            });
+            store.set(LISTS[key].itemsKey, list.items);
             this.render();
 
             if (this.state.isOnline) {
-                const { doc, deleteDoc } = window.firebaseDocs;
-                try {
-                    await deleteDoc(doc(window.firebaseDb, this.DB_COLLECTION, id));
-                } catch (e) { console.error("Error deleting from Firebase:", e); }
-            } else {
-                localStorage.setItem('premium_grocery_items_v1', JSON.stringify(this.state.items));
+                const { doc, writeBatch } = window.firebaseDocs;
+                const batch = writeBatch(window.firebaseDb);
+                items.forEach(item => {
+                    const { id, ...data } = item;
+                    batch.set(doc(window.firebaseDb, LISTS[key].collection, id), this.clean(data));
+                });
+                try { await batch.commit(); } catch (e) { console.error("Error batch saving:", e); this.toast('השמירה לענן נכשלה'); }
             }
         },
 
-        async deleteMultiple(ids) {
-            this.state.items = this.state.items.filter(i => !ids.includes(i.id));
+        async deleteItem(id, key = this.state.tab) {
+            return this.deleteMultiple([id], key);
+        },
+
+        async deleteMultiple(ids, key = this.state.tab) {
+            if (!ids.length) return;
+            const list = this.state.lists[key];
+            list.items = list.items.filter(i => !ids.includes(i.id));
+            store.set(LISTS[key].itemsKey, list.items);
             this.render();
 
             if (this.state.isOnline) {
                 const { doc, writeBatch } = window.firebaseDocs;
                 const batch = writeBatch(window.firebaseDb);
                 ids.forEach(id => {
-                    batch.delete(doc(window.firebaseDb, this.DB_COLLECTION, id));
+                    batch.delete(doc(window.firebaseDb, LISTS[key].collection, id));
                 });
                 try { await batch.commit(); } catch (e) { console.error("Error batch deleting:", e); }
-            } else {
-                localStorage.setItem('premium_grocery_items_v1', JSON.stringify(this.state.items));
             }
         },
 
@@ -463,10 +822,19 @@
                 header: document.getElementById('header'), editModal: document.getElementById('edit-modal'),
                 editId: document.getElementById('edit-id'), editName: document.getElementById('edit-name'),
                 editQty: document.getElementById('edit-qty'), editCat: document.getElementById('edit-category'),
+                editPrice: document.getElementById('edit-price'), editLink: document.getElementById('edit-link'),
+                editNote: document.getElementById('edit-note'), editPriority: document.getElementById('edit-priority'),
+                editSubtotal: document.getElementById('edit-subtotal'), editTitle: document.getElementById('edit-title'),
+                editSaveBtn: document.getElementById('edit-save-btn'),
                 settingsModal: document.getElementById('settings-modal'), categoryEditList: document.getElementById('category-edit-list'),
+                settingsTitle: document.getElementById('settings-title'),
+                packsModal: document.getElementById('packs-modal'), packsBody: document.getElementById('packs-body'),
+                packsTitle: document.getElementById('packs-title'), packsAddBtn: document.getElementById('packs-add-btn'),
                 searchBtn: document.getElementById('search-btn'), searchRow: document.getElementById('search-row'),
                 searchInput: document.getElementById('search-input'), searchClear: document.getElementById('search-clear'),
-                searchMeta: document.getElementById('search-meta')
+                searchMeta: document.getElementById('search-meta'), filterBar: document.getElementById('filter-bar'),
+                syncStatus: document.getElementById('sync-status'), toast: document.getElementById('toast'),
+                main: document.getElementById('main'), fab: document.getElementById('shop-mode-btn')
             };
         },
 
@@ -483,13 +851,97 @@
                 if (e.key === 'Enter') this.dom.searchInput.blur();
             });
 
+            ['input', 'change'].forEach(ev => this.dom.editPrice.addEventListener(ev, () => this.updateEditSubtotal()));
+            this.dom.editName.addEventListener('keydown', (e) => { if (e.key === 'Enter') this.saveEdit(); });
+
             window.addEventListener('scroll', () => {
                 if (window.scrollY > 10) this.dom.header.classList.add('scrolled');
                 else this.dom.header.classList.remove('scrolled');
+            }, { passive: true });
+            [this.dom.editModal, this.dom.settingsModal, this.dom.packsModal].forEach(modal => {
+                modal.addEventListener('click', (e) => { if (e.target === modal) this.closeModal(modal); });
             });
-            [this.dom.editModal, this.dom.settingsModal].forEach(modal => {
-                modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
+            document.addEventListener('keydown', (e) => {
+                if (e.key !== 'Escape') return;
+                const open = document.querySelector('.modal-overlay.active');
+                if (open) this.closeModal(open);
             });
+
+            window.addEventListener('hashchange', () => {
+                const tab = location.hash.slice(1);
+                if (LISTS[tab] && tab !== this.state.tab) this.switchTab(tab);
+            });
+
+            // Horizontal swipe on the list switches tabs (RTL: dragging right reveals the tab on the left)
+            let sx = 0, sy = 0, tracking = false;
+            this.dom.main.addEventListener('touchstart', (e) => {
+                tracking = e.touches.length === 1 && !e.target.closest('.filter-bar, input, textarea, select');
+                if (tracking) { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }
+            }, { passive: true });
+            this.dom.main.addEventListener('touchend', (e) => {
+                if (!tracking) return;
+                tracking = false;
+                const t = e.changedTouches[0];
+                const dx = t.clientX - sx, dy = t.clientY - sy;
+                if (Math.abs(dx) > 80 && Math.abs(dy) < Math.abs(dx) * 0.5) this.switchTab(dx > 0 ? 'home' : 'grocery');
+            }, { passive: true });
+        },
+
+        openModal(modal) { modal.classList.add('active'); },
+        closeModal(modal) { modal.classList.remove('active'); },
+
+        switchTab(tab, { initial = false } = {}) {
+            if (!LISTS[tab] || (tab === this.state.tab && !initial)) return;
+            this.state.tab = tab;
+            store.set('premium_active_tab', tab);
+            if (location.hash !== '#' + tab) history.replaceState(null, '', '#' + tab);
+
+            document.body.classList.toggle('tab-home', tab === 'home');
+            Object.keys(LISTS).forEach(key => {
+                const btn = document.getElementById('tab-' + key);
+                btn.classList.toggle('active', key === tab);
+                btn.setAttribute('aria-selected', String(key === tab));
+            });
+
+            this.dom.searchInput.placeholder = this.cfg.searchPlaceholder;
+            this.dom.editTitle.textContent = this.cfg.editTitle;
+            this.dom.editSaveBtn.textContent = this.cfg.saveLabel;
+            this.dom.editSaveBtn.nextElementSibling.textContent = this.cfg.deleteLabel;
+            this.updateInputPlaceholder();
+            this.populateCategories();
+
+            this.state.animate = true;
+            this.render();
+            if (!initial) window.scrollTo({ top: 0, behavior: 'smooth' });
+        },
+
+        updateInputPlaceholder() {
+            const filter = this.state.homeFilter;
+            if (this.isHome && filter !== 'ALL') {
+                this.dom.input.placeholder = `הוסף ל${this.splitLabel(this.list.categories[filter]).text}...`;
+            } else {
+                this.dom.input.placeholder = this.cfg.placeholder;
+            }
+        },
+
+        setHomeFilter(key) {
+            this.state.homeFilter = this.state.homeFilter === key ? 'ALL' : key;
+            if (this.state.homeFilter !== 'ALL') this.state.collapsed[this.state.homeFilter] = false;
+            this.updateInputPlaceholder();
+            this.state.animate = true;
+            this.render();
+            const chip = this.dom.filterBar.querySelector(`[data-key="${this.state.homeFilter}"]`);
+            if (chip) chip.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        },
+
+        toggleCollapse(key) {
+            this.state.collapsed[key] = !this.state.collapsed[key];
+            store.set('premium_home_collapsed_v1', this.state.collapsed);
+            const group = this.dom.list.querySelector(`.category-group[data-key="${key}"]`);
+            if (group) {
+                group.classList.toggle('collapsed', this.state.collapsed[key]);
+                group.querySelector('.cat-head').setAttribute('aria-expanded', String(!this.state.collapsed[key]));
+            }
         },
 
         toggleSearch() {
@@ -504,8 +956,8 @@
                 this.dom.searchInput.value = '';
                 this.dom.searchClear.classList.remove('visible');
                 this.dom.searchMeta.textContent = '';
-                this.render();
             }
+            this.render();
         },
 
         clearSearch() {
@@ -523,7 +975,8 @@
 
         matchesSearch(item, query) {
             if (!query) return true;
-            return this.normalize(item.name).includes(query) || this.normalize(item.category).includes(query);
+            return this.normalize(item.name).includes(query) || this.normalize(item.category).includes(query)
+                || (item.note && this.normalize(item.note).includes(query));
         },
 
         escapeHtml(str) {
@@ -541,36 +994,65 @@
                 + this.escapeHtml(name.slice(idx + query.length));
         },
 
-        detectCategory(name) {
-            const lowerName = name.toLowerCase();
-            
+        // '🛋️ סלון' -> { icon: '🛋️', text: 'סלון' }; survives user-renamed categories without an emoji
+        splitLabel(label) {
+            const m = String(label || '').match(/^(\p{Extended_Pictographic}[️‍\p{Extended_Pictographic}\p{Emoji_Modifier}]*)\s*(.*)$/u);
+            return m ? { icon: m[1], text: m[2] || m[1] } : { icon: '📦', text: String(label || '') };
+        },
+
+        formatMoney(n) { return this.money.format(Math.round(n || 0)); },
+
+        parsePrice(str) {
+            const num = parseFloat(String(str || '').replace(/[^\d.]/g, ''));
+            return isNaN(num) || num <= 0 ? null : Math.round(num * 100) / 100;
+        },
+
+        safeLink(link) {
+            const url = String(link || '').trim();
+            if (!url) return '';
+            const withProto = /^https?:\/\//i.test(url) ? url : 'https://' + url;
+            try { return ['http:', 'https:'].includes(new URL(withProto).protocol) ? withProto : ''; } catch (e) { return ''; }
+        },
+
+        itemTotal(item) { return (Number(item.price) || 0) * (item.quantity || 1); },
+
+        catKeyOf(item, key = this.state.tab) {
+            const cats = this.state.lists[key].categories;
+            return Object.keys(cats).find(k => cats[k] === item.category) || 'OTHER';
+        },
+
+        detectCategory(name, key = this.state.tab) {
+            const list = this.state.lists[key];
+            const lowerName = name.toLowerCase().trim().replace(/״/g, '"').replace(/׳/g, "'");
+
             // 1. Check user's learned dictionary first for exact match
-            if (this.state.learnedDict[lowerName]) {
-                return this.state.learnedDict[lowerName];
+            if (list.learnedDict[lowerName]) {
+                return list.learnedDict[lowerName];
             }
 
             // 2. Check if the learned dictionary contains a word that is IN the input
-            for (const learnedWord in this.state.learnedDict) {
+            for (const learnedWord in list.learnedDict) {
                 if (lowerName.includes(learnedWord)) {
-                    return this.state.learnedDict[learnedWord];
+                    return list.learnedDict[learnedWord];
                 }
             }
 
             // 3. Fallback to built-in Smart Dict
-            for (const key of this.sortedDictKeys) {
-                if (lowerName.includes(key)) {
-                    return this.state.categories[this.SMART_DICT[key]];
+            const dict = this.dicts[key];
+            for (const word of this.sortedDictKeys[key]) {
+                if (lowerName.includes(word)) {
+                    return list.categories[dict[word]];
                 }
             }
-            
-            return this.state.categories.OTHER;
+
+            return list.categories.OTHER;
         },
 
         learnCategory(name, categoryName) {
             const lowerName = name.trim().toLowerCase();
             // We map the exact word to the category the user selected
-            this.state.learnedDict[lowerName] = categoryName;
-            localStorage.setItem('premium_learned_dict_v1', JSON.stringify(this.state.learnedDict));
+            this.list.learnedDict[lowerName] = categoryName;
+            store.set(this.cfg.dictKey, this.list.learnedDict);
         },
 
         changeMainQty(delta) {
@@ -585,35 +1067,56 @@
             this.dom.mainQty.value = num;
         },
 
+        // "ספה 3500₪" / "מנורה ₪250" / "שטיח 900 ש"ח" -> name + price (home tab only)
+        parseNameAndPrice(text) {
+            const m = text.match(/^(.*?)\s*(?:₪\s*(\d[\d,.]*)|(\d[\d,.]*)\s*(?:₪|ש["״]?ח|שקל(?:ים)?))\s*$/);
+            if (!m || !m[1].trim()) return { name: text, price: null };
+            return { name: m[1].trim(), price: this.parsePrice(m[2] || m[3]) };
+        },
+
         addFromInput() {
-            const name = this.dom.input.value.trim();
-            if (!name) return;
-            this.addItem(name, this.state.mainQty);
+            const raw = this.dom.input.value.trim();
+            if (!raw) return;
+            if (this.isHome) {
+                const { name, price } = this.parseNameAndPrice(raw);
+                const filter = this.state.homeFilter;
+                this.addItem(name, this.state.mainQty, { price, category: filter !== 'ALL' ? this.list.categories[filter] : undefined });
+            } else {
+                this.addItem(raw, this.state.mainQty);
+            }
             this.dom.input.value = '';
             this.state.mainQty = 1;
             this.dom.mainQty.value = '1';
             this.dom.input.blur();
         },
 
-        addItem(name, qty = 1) {
-            const existing = this.state.items.find(i => i.name === name && !i.completed);
+        addItem(name, qty = 1, opts = {}) {
+            const existing = this.list.items.find(i => i.name === name && !i.completed);
             if (existing) {
                 existing.quantity += qty;
+                if (opts.price) existing.price = opts.price;
                 this.saveItem(existing);
-            } else {
-                const newItem = { id: Date.now().toString(36), name: name, quantity: qty, category: this.detectCategory(name), completed: false };
-                this.saveItem(newItem);
+                if (this.isHome) this.toast(`${name} — הכמות עודכנה ל-${existing.quantity}`);
+                return existing;
             }
+            const newItem = { id: this.uid(), name: name, quantity: qty, category: opts.category || this.detectCategory(name), completed: false, createdAt: Date.now() };
+            if (this.isHome) {
+                Object.assign(newItem, { price: opts.price || null, priority: 'normal', note: '', link: '' });
+                this.state.collapsed[this.catKeyOf(newItem)] = false;
+            }
+            this.saveItem(newItem);
+            if (this.isHome) this.toast(`נוסף ל${newItem.category}`, 'עריכה', () => this.openEdit(newItem.id));
+            return newItem;
         },
 
         toggleItem(id) {
-            const item = this.state.items.find(i => i.id === id);
+            const item = this.list.items.find(i => i.id === id);
             if (item) { item.completed = !item.completed; this.saveItem(item); }
         },
 
         changeItemQty(id, delta, event) {
             event.stopPropagation();
-            const item = this.state.items.find(i => i.id === id);
+            const item = this.list.items.find(i => i.id === id);
             if (item) { item.quantity = Math.max(1, item.quantity + delta); this.saveItem(item); }
         },
 
@@ -621,28 +1124,49 @@
             if (event) event.stopPropagation();
             let num = parseInt(val);
             if (isNaN(num) || num < 1) num = 1;
-            const item = this.state.items.find(i => i.id === id);
+            const item = this.list.items.find(i => i.id === id);
             if (item) { item.quantity = num; this.saveItem(item); }
         },
 
-        openEdit(id, event) {
-            event.stopPropagation();
-            const item = this.state.items.find(i => i.id === id);
+        openEdit(id, event, focusField) {
+            if (event) event.stopPropagation();
+            const item = this.list.items.find(i => i.id === id);
             if (!item) return;
 
             this.dom.editId.value = item.id;
             this.dom.editName.value = item.name;
             this.state.editQty = item.quantity;
             this.dom.editQty.value = item.quantity;
+            if (![...this.dom.editCat.options].some(o => o.value === item.category)) this.populateCategories(item.category);
             this.dom.editCat.value = item.category;
-            this.dom.editModal.classList.add('active');
+            if (this.isHome) {
+                this.dom.editPrice.value = item.price ? String(item.price) : '';
+                this.dom.editLink.value = item.link || '';
+                this.dom.editNote.value = item.note || '';
+                this.setEditPriority(item.priority || 'normal');
+                this.updateEditSubtotal();
+            }
+            this.openModal(this.dom.editModal);
+            if (focusField === 'price') setTimeout(() => this.dom.editPrice.focus(), 350);
         },
 
-        closeEdit() { this.dom.editModal.classList.remove('active'); },
+        closeEdit() { this.closeModal(this.dom.editModal); },
+
+        setEditPriority(p) {
+            this.state.editPriority = p;
+            this.dom.editPriority.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.p === p));
+        },
+
+        updateEditSubtotal() {
+            const price = this.parsePrice(this.dom.editPrice.value);
+            const qty = this.state.editQty;
+            this.dom.editSubtotal.textContent = price && qty > 1 ? `סה״כ ${qty} יח׳: ${this.formatMoney(price * qty)}` : '';
+        },
 
         changeEditQty(delta) {
             this.state.editQty = Math.max(1, this.state.editQty + delta);
             this.dom.editQty.value = this.state.editQty;
+            this.updateEditSubtotal();
         },
 
         setEditQty(val) {
@@ -650,25 +1174,32 @@
             if (isNaN(num) || num < 1) num = 1;
             this.state.editQty = num;
             this.dom.editQty.value = num;
+            this.updateEditSubtotal();
         },
 
         saveEdit() {
             const id = this.dom.editId.value;
             const name = this.dom.editName.value.trim();
             const newCat = this.dom.editCat.value;
-            if (!name) return;
+            if (!name) { this.dom.editName.focus(); return; }
 
-            const item = this.state.items.find(i => i.id === id);
+            const item = this.list.items.find(i => i.id === id);
             if (item) {
                 item.name = name;
                 item.quantity = this.state.editQty;
-                
+
                 // If category changed, learn the preference for this specific term
                 if (item.category !== newCat) {
                     this.learnCategory(name, newCat);
                 }
-                
+
                 item.category = newCat;
+                if (this.isHome) {
+                    item.price = this.parsePrice(this.dom.editPrice.value);
+                    item.priority = this.state.editPriority;
+                    item.link = this.safeLink(this.dom.editLink.value);
+                    item.note = this.dom.editNote.value.trim();
+                }
                 this.saveItem(item);
             }
             this.closeEdit();
@@ -676,79 +1207,85 @@
 
         deleteFromEdit() {
             const id = this.dom.editId.value;
+            const item = this.list.items.find(i => i.id === id);
+            const key = this.state.tab;
             this.deleteItem(id);
             this.closeEdit();
+            if (item) this.toast(`"${item.name}" נמחק`, 'ביטול', () => this.saveItem(item, key));
         },
 
-        populateCategories() {
-            this.dom.editCat.innerHTML = Object.values(this.state.categories)
-                .map(c => `<option value="${c}">${c}</option>`).join('');
+        populateCategories(extra) {
+            const values = Object.values(this.list.categories);
+            if (extra && !values.includes(extra)) values.push(extra);
+            this.dom.editCat.innerHTML = values
+                .map(c => `<option value="${this.escapeHtml(c)}">${this.escapeHtml(c)}</option>`).join('');
         },
 
-        openSettings() { 
-            this.dom.categoryEditList.innerHTML = Object.entries(this.state.categories).map(([key, val]) => `
+        openSettings() {
+            this.dom.settingsTitle.textContent = this.cfg.settingsTitle;
+            this.dom.categoryEditList.innerHTML = Object.entries(this.list.categories).map(([key, val]) => `
                 <div class="cat-edit-row">
-                    <input type="text" class="cat-edit-input" data-key="${key}" value="${val}">
+                    <input type="text" class="cat-edit-input" data-key="${key}" value="${this.escapeHtml(val)}">
                 </div>
             `).join('');
-            this.dom.settingsModal.classList.add('active'); 
+            this.openModal(this.dom.settingsModal);
         },
 
         async saveCategories() {
             const inputs = document.querySelectorAll('.cat-edit-input');
+            const list = this.list;
             let updated = false;
             const oldToNewMap = {};
 
             inputs.forEach(input => {
                 const key = input.dataset.key;
                 const newName = input.value.trim();
-                const oldName = this.state.categories[key];
+                const oldName = list.categories[key];
 
                 if (newName && newName !== oldName) {
-                    this.state.categories[key] = newName;
+                    list.categories[key] = newName;
                     oldToNewMap[oldName] = newName;
                     updated = true;
                 }
             });
 
             if (updated) {
-                localStorage.setItem('premium_grocery_cats_v1', JSON.stringify(this.state.categories));
+                store.set(this.cfg.catsKey, list.categories);
                 this.populateCategories();
+                this.updateInputPlaceholder();
 
-                const promises = [];
-                this.state.items.forEach(item => {
-                    if (oldToNewMap[item.category]) {
-                        item.category = oldToNewMap[item.category];
-                        promises.push(this.saveItem(item));
-                    }
-                });
-                
+                const changed = list.items.filter(item => oldToNewMap[item.category]);
+                changed.forEach(item => { item.category = oldToNewMap[item.category]; });
+
                 let dictUpdated = false;
-                for (const term in this.state.learnedDict) {
-                    if (oldToNewMap[this.state.learnedDict[term]]) {
-                        this.state.learnedDict[term] = oldToNewMap[this.state.learnedDict[term]];
+                for (const term in list.learnedDict) {
+                    if (oldToNewMap[list.learnedDict[term]]) {
+                        list.learnedDict[term] = oldToNewMap[list.learnedDict[term]];
                         dictUpdated = true;
                     }
                 }
-                if(dictUpdated) localStorage.setItem('premium_learned_dict_v1', JSON.stringify(this.state.learnedDict));
+                if(dictUpdated) store.set(this.cfg.dictKey, list.learnedDict);
 
-                await Promise.all(promises);
+                if (changed.length) await this.saveMany(changed);
+                else this.render();
             }
-            this.dom.settingsModal.classList.remove('active');
+            this.closeModal(this.dom.settingsModal);
         },
-        
+
         clearList() {
             if (confirm('בטוח שברצונך למחוק את כל הרשימה?')) {
-                const ids = this.state.items.map(i => i.id);
+                const ids = this.list.items.map(i => i.id);
                 this.deleteMultiple(ids);
-                this.dom.settingsModal.classList.remove('active');
+                this.closeModal(this.dom.settingsModal);
             }
         },
 
         clearCompleted() {
-            const ids = this.state.items.filter(i => i.completed).map(i => i.id);
-            this.deleteMultiple(ids);
-            this.dom.settingsModal.classList.remove('active');
+            const done = this.list.items.filter(i => i.completed);
+            const key = this.state.tab;
+            this.deleteMultiple(done.map(i => i.id));
+            this.closeModal(this.dom.settingsModal);
+            if (done.length) this.toast(`נמחקו ${done.length} פריטים שנקנו`, 'ביטול', () => this.saveMany(done, key));
         },
 
         toggleShoppingMode() {
@@ -759,30 +1296,181 @@
             this.render();
         },
 
+        toast(message, actionLabel, action) {
+            const t = this.dom.toast;
+            const btn = t.querySelector('.toast-action');
+            t.querySelector('.toast-msg').textContent = message;
+            btn.hidden = !actionLabel;
+            btn.textContent = actionLabel || '';
+            btn.onclick = () => { this.hideToast(); if (action) action(); };
+            t.classList.add('show');
+            clearTimeout(this.toastTimer);
+            this.toastTimer = setTimeout(() => this.hideToast(), actionLabel ? 4500 : 2600);
+        },
+
+        hideToast() { this.dom.toast.classList.remove('show'); },
+
+        // --- Ready-made room checklists ---
+        packStats(catKey) {
+            const names = new Set(this.state.lists.home.items.map(i => i.name));
+            const pack = HOME_PACKS[catKey] || [];
+            return { total: pack.length, existing: pack.filter(n => names.has(n)).length };
+        },
+
+        packGridHtml() {
+            const cats = this.state.lists.home.categories;
+            return `<div class="pack-grid">${Object.keys(HOME_PACKS).map(key => {
+                const { icon, text } = this.splitLabel(cats[key]);
+                const { total, existing } = this.packStats(key);
+                const done = existing === total;
+                return `<button class="pack-card ${done ? 'done' : ''}" onclick="App.openPacks('${key}')">
+                    <span class="pack-emoji">${icon}</span>
+                    <span class="pack-name">${this.escapeHtml(text)}</span>
+                    <span class="pack-count">${done ? '✓ הכל ברשימה' : existing ? `${total - existing} מתוך ${total} חסרים` : `${total} פריטים`}</span>
+                </button>`;
+            }).join('')}</div>`;
+        },
+
+        openPacks(catKey) {
+            if (catKey && HOME_PACKS[catKey]) {
+                const names = new Set(this.state.lists.home.items.map(i => i.name));
+                this.packView = { key: catKey, selected: new Set(HOME_PACKS[catKey].filter(n => !names.has(n))) };
+            } else {
+                this.packView = null;
+            }
+            this.renderPacks();
+            this.openModal(this.dom.packsModal);
+        },
+
+        renderPacks() {
+            const view = this.packView;
+            const btn = this.dom.packsAddBtn;
+            if (!view) {
+                this.dom.packsTitle.textContent = 'רשימות מוכנות לפי חדר';
+                this.dom.packsBody.innerHTML = `<p class="form-hint" style="margin: 0 0 16px; font-size: 14px;">בחרו חדר, סמנו מה צריך — והכל נכנס לרשימה בלחיצה אחת.</p>${this.packGridHtml()}`;
+                btn.hidden = true;
+                return;
+            }
+            const label = this.state.lists.home.categories[view.key];
+            const names = new Set(this.state.lists.home.items.map(i => i.name));
+            const pack = HOME_PACKS[view.key];
+            const available = pack.filter(n => !names.has(n));
+            const allSelected = available.length > 0 && available.every(n => view.selected.has(n));
+            this.dom.packsTitle.textContent = label;
+            this.dom.packsBody.innerHTML = `
+                <div class="pack-detail-top">
+                    <button class="pack-back" onclick="App.openPacks()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        כל החדרים
+                    </button>
+                    ${available.length ? `<button class="pack-toggle-all" onclick="App.togglePackAll()">${allSelected ? 'נקה הכל' : 'בחר הכל'}</button>` : ''}
+                </div>
+                <div class="pack-list">${pack.map((name, idx) => {
+                    const exists = names.has(name);
+                    const checked = exists || view.selected.has(name);
+                    return `<div class="pack-item ${exists ? 'exists' : ''}" ${exists ? '' : `onclick="App.togglePackItem(${idx})"`}>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" class="checkbox-input" ${checked ? 'checked' : ''} ${exists ? 'disabled' : ''} tabindex="-1" onclick="event.preventDefault()">
+                            <div class="checkbox-custom"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+                        </div>
+                        <span class="pack-item-name">${this.escapeHtml(name)}</span>
+                        ${exists ? '<span class="pack-tag">כבר ברשימה</span>' : ''}
+                    </div>`;
+                }).join('')}</div>`;
+            const count = view.selected.size;
+            btn.hidden = false;
+            btn.disabled = count === 0;
+            btn.textContent = count ? `הוסף ${count} פריטים ל${this.splitLabel(label).text}` : (available.length ? 'בחרו פריטים להוספה' : 'כל הפריטים כבר ברשימה');
+        },
+
+        togglePackItem(idx) {
+            const name = HOME_PACKS[this.packView.key][idx];
+            const sel = this.packView.selected;
+            sel.has(name) ? sel.delete(name) : sel.add(name);
+            this.renderPacks();
+        },
+
+        togglePackAll() {
+            const names = new Set(this.state.lists.home.items.map(i => i.name));
+            const available = HOME_PACKS[this.packView.key].filter(n => !names.has(n));
+            const allSelected = available.every(n => this.packView.selected.has(n));
+            this.packView.selected = new Set(allSelected ? [] : available);
+            this.renderPacks();
+        },
+
+        addSelectedPack() {
+            const view = this.packView;
+            if (!view || !view.selected.size) return;
+            const home = this.state.lists.home;
+            const category = home.categories[view.key];
+            const now = Date.now();
+            // Keep the pack's order: it's the order people usually shop a room in
+            const items = HOME_PACKS[view.key].filter(n => view.selected.has(n)).map((name, i) => ({
+                id: this.uid(), name, quantity: 1, category, completed: false, createdAt: now + i,
+                price: null, priority: 'normal', note: '', link: ''
+            }));
+            this.state.collapsed[view.key] = false;
+            this.closeModal(this.dom.packsModal);
+            if (this.state.tab !== 'home') this.switchTab('home');
+            this.saveMany(items, 'home');
+            this.toast(`נוספו ${items.length} פריטים ל${this.splitLabel(category).text}`, 'ביטול', () => this.deleteMultiple(items.map(i => i.id), 'home'));
+        },
+
+        updateBadges() {
+            Object.keys(LISTS).forEach(key => {
+                const n = this.state.lists[key].items.filter(i => !i.completed).length;
+                document.getElementById('badge-' + key).textContent = n ? String(n) : '';
+            });
+        },
+
         renderSuggestions() {
             this.dom.suggestions.innerHTML = '';
-            const activeNames = this.state.items.filter(i => !i.completed).map(i => i.name);
-            const available = this.SUGGESTIONS.filter(s => !activeNames.includes(s));
-            
-            available.slice(0, 6).forEach(s => {
-                const chip = document.createElement('div');
+            const activeNames = this.list.items.filter(i => !i.completed).map(i => i.name);
+            const filter = this.state.homeFilter;
+            let source = this.SUGGESTIONS, category, limit = 6;
+            if (this.isHome) {
+                const allNames = new Set(this.list.items.map(i => i.name));
+                source = (filter !== 'ALL' && HOME_PACKS[filter] ? HOME_PACKS[filter] : this.HOME_SUGGESTIONS).filter(s => !allNames.has(s));
+                category = filter !== 'ALL' ? this.list.categories[filter] : undefined;
+                limit = 8;
+            }
+            const available = source.filter(s => !activeNames.includes(s));
+
+            available.slice(0, limit).forEach(s => {
+                const chip = document.createElement('button');
+                chip.type = 'button';
                 chip.className = 'chip';
-                chip.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> ${s}`;
-                chip.onclick = () => this.addItem(s, 1);
+                chip.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> ${this.escapeHtml(s)}`;
+                chip.onclick = () => this.addItem(s, 1, { category });
                 this.dom.suggestions.appendChild(chip);
             });
         },
 
         render() {
-            this.dom.list.innerHTML = '';
+            this.updateBadges();
             this.renderSuggestions();
+            this.dom.list.innerHTML = '';
 
-            const total = this.state.items.length;
-            const completedCount = this.state.items.filter(i => i.completed).length;
+            // Entry animation only on tab switch / filter change, not on every check-off
+            if (this.state.animate) {
+                this.state.animate = false;
+                this.dom.list.classList.remove('animate');
+                void this.dom.list.offsetWidth;
+                this.dom.list.classList.add('animate');
+                clearTimeout(this.animTimer);
+                this.animTimer = setTimeout(() => this.dom.list.classList.remove('animate'), 700);
+            }
+
+            const items = this.list.items;
+            const total = items.length;
+            const completedCount = items.filter(i => i.completed).length;
 
             // Progress always reflects the full list, not the filtered view
             this.dom.progText.textContent = `${completedCount}/${total} נקנו`;
             this.dom.progBar.style.width = total === 0 ? '0%' : `${(completedCount / total) * 100}%`;
+            this.dom.fab.hidden = total === 0 && !this.state.shoppingMode;
+
+            if (this.isHome) return this.renderHome();
 
             if (total === 0) {
                 this.dom.searchMeta.textContent = '';
@@ -796,42 +1484,30 @@
             }
 
             const query = this.normalize(this.state.search);
-            const visible = this.state.items.filter(i => this.matchesSearch(i, query));
-
-            if (query) {
-                const foundDone = visible.filter(i => i.completed).length;
-                this.dom.searchMeta.textContent = visible.length === 0
-                    ? 'אין התאמות'
-                    : `${visible.length} תוצאות, מתוכן ${foundDone} מסומנות כנקנו`;
-            } else {
-                this.dom.searchMeta.textContent = this.state.searchOpen ? 'הקלד שם מוצר או קטגוריה' : '';
-            }
+            const visible = items.filter(i => this.matchesSearch(i, query));
+            this.renderSearchMeta(query, visible);
 
             if (query && visible.length === 0) {
-                this.dom.list.innerHTML = `
-                    <div class="empty-state">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        <h3>לא נמצא מוצר תואם</h3>
-                        <p>נסה מילה חלקית, למשל "חל" במקום "חלב 3%"</p>
-                    </div>`;
+                this.dom.list.innerHTML = this.noResultsHtml('נסה מילה חלקית, למשל "חל" במקום "חלב 3%"');
                 return;
             }
 
+            const categories = this.list.categories;
             const active = visible.filter(i => !i.completed);
             const completed = visible.filter(i => i.completed);
             const grouped = {};
-            
-            Object.values(this.state.categories).forEach(c => grouped[c] = []);
+
+            Object.values(categories).forEach(c => grouped[c] = []);
             active.forEach(i => {
                 if (grouped[i.category]) {
                     grouped[i.category].push(i);
                 } else {
-                    if (!grouped[this.state.categories.OTHER]) grouped[this.state.categories.OTHER] = [];
-                    grouped[this.state.categories.OTHER].push(i);
+                    if (!grouped[categories.OTHER]) grouped[categories.OTHER] = [];
+                    grouped[categories.OTHER].push(i);
                 }
             });
 
-            Object.values(this.state.categories).forEach(cat => {
+            Object.values(categories).forEach(cat => {
                 if (grouped[cat] && grouped[cat].length > 0) this.dom.list.appendChild(this.buildGroup(cat, grouped[cat]));
             });
 
@@ -843,10 +1519,208 @@
             }
         },
 
+        renderSearchMeta(query, visible) {
+            if (query) {
+                const foundDone = visible.filter(i => i.completed).length;
+                this.dom.searchMeta.textContent = visible.length === 0
+                    ? 'אין התאמות'
+                    : `${visible.length} תוצאות, מתוכן ${foundDone} מסומנות כנקנו`;
+            } else {
+                this.dom.searchMeta.textContent = this.state.searchOpen ? (this.isHome ? 'הקלד שם פריט, חדר או הערה' : 'הקלד שם מוצר או קטגוריה') : '';
+            }
+        },
+
+        noResultsHtml(hint) {
+            return `
+                <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <h3>לא נמצא מוצר תואם</h3>
+                    <p>${this.escapeHtml(hint)}</p>
+                </div>`;
+        },
+
+        renderFilterBar() {
+            const { items, categories } = this.list;
+            const counts = {};
+            items.forEach(i => { if (!i.completed) { const k = this.catKeyOf(i); counts[k] = (counts[k] || 0) + 1; } });
+            const totalActive = items.filter(i => !i.completed).length;
+            const filter = this.state.homeFilter;
+            const scroll = this.dom.filterBar.scrollLeft;
+            this.dom.filterBar.innerHTML = `<button class="fchip ${filter === 'ALL' ? 'active' : ''}" data-key="ALL" onclick="App.setHomeFilter('ALL')">🏠 הכל${totalActive ? ` <span class="fcount">${totalActive}</span>` : ''}</button>`
+                + Object.entries(categories).map(([key, label]) => {
+                    const n = counts[key] || 0;
+                    return `<button class="fchip ${filter === key ? 'active' : ''} ${n ? '' : 'is-empty'}" data-key="${key}" onclick="App.setHomeFilter('${key}')">${this.escapeHtml(label)}${n ? ` <span class="fcount">${n}</span>` : ''}</button>`;
+                }).join('');
+            this.dom.filterBar.scrollLeft = scroll;
+        },
+
+        renderHome() {
+            const { items, categories } = this.list;
+            const filter = this.state.homeFilter;
+            const query = this.normalize(this.state.search);
+            this.renderFilterBar();
+
+            if (items.length === 0) {
+                this.dom.searchMeta.textContent = '';
+                this.dom.list.innerHTML = `
+                    <div class="empty-state home-empty">
+                        <div class="es-emoji">🏡</div>
+                        <h3>בונים בית? מתחילים כאן</h3>
+                        <p>הוסיפו רהיטים ומוצרי חשמל בשדה למטה, או התחילו מרשימה מוכנה לפי חדר</p>
+                        ${this.packGridHtml()}
+                    </div>`;
+                return;
+            }
+
+            const inScope = items.filter(i => filter === 'ALL' || this.catKeyOf(i) === filter);
+            const visible = inScope.filter(i => this.matchesSearch(i, query));
+            this.renderSearchMeta(query, visible);
+
+            if (query && visible.length === 0) {
+                this.dom.list.innerHTML = this.noResultsHtml(filter !== 'ALL' ? 'החיפוש מוגבל לחדר שנבחר — נסו "הכל"' : 'נסו מילה חלקית, שם חדר או מילה מההערות');
+                return;
+            }
+
+            if (inScope.length === 0) {
+                const { icon, text } = this.splitLabel(categories[filter]);
+                const hasPack = !!HOME_PACKS[filter];
+                const box = document.createElement('div');
+                box.className = 'empty-cat';
+                box.innerHTML = `
+                    <div class="ec-emoji">${icon}</div>
+                    <h3>עוד אין כלום ב${this.escapeHtml(text)}</h3>
+                    <p>כל מה שתוסיפו עכשיו מהשדה למטה ייכנס ישר לכאן</p>
+                    ${hasPack ? `<button class="soft-btn" onclick="App.openPacks('${filter}')">✨ רשימה מוכנה ל${this.escapeHtml(text)} (${HOME_PACKS[filter].length} פריטים)</button>` : ''}`;
+                this.dom.list.appendChild(box);
+                return;
+            }
+
+            if (!query && !this.state.shoppingMode) this.dom.list.appendChild(this.buildSummary(inScope));
+
+            const rank = { high: 0, normal: 1, low: 2 };
+            const byPriority = arr => arr.slice().sort((a, b) => (rank[a.priority] ?? 1) - (rank[b.priority] ?? 1));
+            const active = visible.filter(i => !i.completed);
+            const completed = visible.filter(i => i.completed);
+            const grouped = {};
+            active.forEach(i => { const k = this.catKeyOf(i); (grouped[k] = grouped[k] || []).push(i); });
+
+            Object.entries(categories).forEach(([key, label]) => {
+                if (grouped[key]) this.dom.list.appendChild(this.buildHomeGroup(key, label, byPriority(grouped[key])));
+            });
+
+            if (completed.length > 0 && (!this.state.shoppingMode || query)) {
+                const title = query ? '✅ נקנו — הקש כדי להחזיר לרשימה' : '✅ נקנו';
+                this.dom.list.appendChild(this.buildHomeGroup('DONE', title, completed, true));
+            }
+
+            if (active.length === 0 && !query && completed.length > 0) {
+                const done = document.createElement('div');
+                done.className = 'empty-cat';
+                done.innerHTML = `<div class="ec-emoji">🎉</div><h3>הכל נקנה!</h3><p>כל הפריטים כאן מסומנים כנקנו</p>`;
+                this.dom.list.insertBefore(done, this.dom.list.children[1] || null);
+            }
+        },
+
+        buildSummary(items) {
+            const filter = this.state.homeFilter;
+            const priced = items.filter(i => Number(i.price) > 0);
+            const sum = arr => arr.reduce((acc, i) => acc + this.itemTotal(i), 0);
+            const total = sum(priced);
+            const spent = sum(priced.filter(i => i.completed));
+            const done = items.filter(i => i.completed).length;
+            const unpriced = items.filter(i => !i.completed && !(Number(i.price) > 0)).length;
+            const scope = filter !== 'ALL' ? this.splitLabel(this.list.categories[filter]).text : 'כל הבית';
+
+            const el = document.createElement('section');
+            el.className = 'home-summary';
+            el.innerHTML = `
+                <div class="sum-head">
+                    <div>
+                        <div class="sum-label">תקציב · ${this.escapeHtml(scope)}</div>
+                        <div class="sum-amount">${this.formatMoney(total)}</div>
+                    </div>
+                    ${HOME_PACKS[filter] || filter === 'ALL' ? `<button class="sum-pack-btn" onclick="App.openPacks(${filter !== 'ALL' ? `'${filter}'` : ''})">✨ רשימות מוכנות</button>` : ''}
+                </div>
+                <div class="sum-stats">
+                    <div class="sum-stat"><span>נקנה</span><b>${this.formatMoney(spent)}</b></div>
+                    <div class="sum-stat"><span>נותר</span><b>${this.formatMoney(total - spent)}</b></div>
+                    <div class="sum-stat"><span>פריטים</span><b>${done}/${items.length}</b></div>
+                </div>
+                <div class="sum-bar"><div style="width: ${items.length ? (done / items.length) * 100 : 0}%"></div></div>
+                ${unpriced ? `<div class="sum-hint">${unpriced === 1 ? 'פריט אחד עדיין בלי מחיר' : `${unpriced} פריטים עדיין בלי מחיר`}</div>` : ''}`;
+            return el;
+        },
+
+        buildHomeGroup(key, title, items, isCompleted = false) {
+            const group = document.createElement('div');
+            const collapsed = !!this.state.collapsed[key] && !this.state.search.trim();
+            group.className = `category-group ${collapsed ? 'collapsed' : ''}`;
+            group.dataset.key = key;
+
+            const subtotal = items.reduce((acc, i) => acc + this.itemTotal(i), 0);
+            const head = document.createElement('button');
+            head.type = 'button';
+            head.className = 'cat-head';
+            head.setAttribute('aria-expanded', String(!collapsed));
+            head.innerHTML = `
+                <span>${this.escapeHtml(title)}</span>
+                <span class="cat-count">${items.length}</span>
+                ${subtotal ? `<span class="cat-sum">${this.formatMoney(subtotal)}</span>` : ''}
+                <svg class="cat-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+            head.onclick = () => this.toggleCollapse(key);
+            group.appendChild(head);
+
+            const card = document.createElement('div');
+            card.className = 'items-card';
+            const showCategory = isCompleted || !!this.state.search.trim();
+
+            items.forEach(item => {
+                const row = document.createElement('div');
+                row.className = `item-row home-row ${isCompleted ? 'completed' : ''}`;
+                row.onclick = () => this.toggleItem(item.id);
+
+                const price = Number(item.price) || 0;
+                const qty = item.quantity || 1;
+                const link = this.safeLink(item.link);
+                const pill = item.priority === 'high' ? '<span class="pill high">🔥 דחוף</span>'
+                    : item.priority === 'low' ? '<span class="pill low">יכול לחכות</span>' : '';
+                const priceHtml = price
+                    ? `<div class="price-col"><span class="price-main">${this.formatMoney(price * qty)}</span>${qty > 1 ? `<span class="price-unit">${this.formatMoney(price)} ליח׳</span>` : ''}</div>`
+                    : (isCompleted ? '' : `<button class="add-price" onclick="App.openEdit('${item.id}', event, 'price')">+ מחיר</button>`);
+
+                row.innerHTML = `
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" class="checkbox-input" ${isCompleted ? 'checked' : ''} onclick="event.stopPropagation(); App.toggleItem('${item.id}')" aria-label="סמן כנקנה">
+                        <div class="checkbox-custom">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                    </div>
+                    <div class="item-content">
+                        <span class="item-name">${this.highlight(item.name)}${qty > 1 ? `<span class="qty-badge">×${qty}</span>` : ''}</span>
+                        <div class="item-meta">${pill}${showCategory ? `<span class="item-category-label">${this.escapeHtml(item.category)}</span>` : ''}</div>
+                        ${item.note ? `<span class="item-note">${this.highlight(item.note)}</span>` : ''}
+                    </div>
+                    <div class="item-actions">
+                        ${priceHtml}
+                        ${link ? `<a class="action-btn link" href="${this.escapeHtml(link)}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" aria-label="פתח קישור למוצר">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                        </a>` : ''}
+                        <button class="action-btn edit" onclick="App.openEdit('${item.id}', event)" aria-label="עריכה">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        </button>
+                    </div>
+                `;
+                card.appendChild(row);
+            });
+
+            group.appendChild(card);
+            return group;
+        },
+
         buildGroup(title, items, isCompleted = false) {
             const group = document.createElement('div');
             group.className = 'category-group';
-            
+
             const header = document.createElement('div');
             header.className = 'category-header';
             header.textContent = title;
@@ -859,7 +1733,7 @@
                 const row = document.createElement('div');
                 row.className = `item-row ${isCompleted ? 'completed' : ''}`;
                 row.onclick = () => this.toggleItem(item.id);
-                
+
                 row.innerHTML = `
                     <div class="checkbox-wrapper">
                         <input type="checkbox" class="checkbox-input" ${isCompleted ? 'checked' : ''} onclick="event.stopPropagation(); App.toggleItem('${item.id}')">
@@ -869,7 +1743,7 @@
                     </div>
                     <div class="item-content">
                         <span class="item-name">${this.highlight(item.name)}</span>
-                        ${isCompleted && !this.state.search.trim() ? '' : `<span class="item-category-label">${item.category}</span>`}
+                        ${isCompleted && !this.state.search.trim() ? '' : `<span class="item-category-label">${this.escapeHtml(item.category)}</span>`}
                     </div>
                     <div class="item-actions">
                         <div class="qty-control" onclick="event.stopPropagation()">
@@ -892,7 +1766,6 @@
 
     document.addEventListener('DOMContentLoaded', () => App.init());
 </script>
-```
 
 </body>
 </html>
